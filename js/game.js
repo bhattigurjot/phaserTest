@@ -4,6 +4,7 @@
 
 let GameState = {
     player: null,
+    background: null,
     platforms: null,
     ground: null,
     ledge1: null,
@@ -24,6 +25,10 @@ let GameState = {
     create: function() {
         let self = this;
 
+        // Input
+        self.cursors = game.input.keyboard.createCursorKeys();
+        game.input.mouse.capture = true;
+
         // Disable right click context meny
         game.canvas.oncontextmenu = function (e) {
             e.preventDefault();
@@ -33,7 +38,9 @@ let GameState = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         // Background
-        game.add.sprite(0,0,'sky');
+        self.background = game.add.sprite(0,0,'sky');
+        self.background.inputEnabled = true;
+        self.background.events.onInputDown.add(self.addLedge, self);
 
         // Play button
         self.playButton = game.add.sprite(700, 10,'play');
@@ -53,20 +60,19 @@ let GameState = {
         // Ledges
         self.platforms.add(Ledge(self.platforms,100,100));
         self.platforms.add(Ledge(self.platforms,400,400));
-        self.platforms.add(Ledge(self.platforms,-150,250));
+        self.platforms.add(Ledge(self.platforms,10,250));
 
         // Player
         self.player = new Player(10,10);
 
-        self.cursors = game.input.keyboard.createCursorKeys();
     },
 
     update: function () {
         let self = this;
 
-        if (game.input.activePointer.rightButton.isDown) {
-            // addLedge();
-        }
+        // if (game.input.activePointer.rightButton.isDown) {
+        //     addLedge(self.platforms);
+        // }
 
         if (self.isPlaying) {
             let hitPlatform = game.physics.arcade.collide(self.player, self.platforms);
@@ -120,6 +126,14 @@ let GameState = {
         } else {
             reset(self.playButton, self.player, self.platforms);
         }
+    },
+
+    addLedge: function (background, pointer) {
+        let self = this;
+        if (pointer.rightButton.isDown && !self.isPlaying) {
+        // if (game.input.activePointer.rightButton.isDown) {
+            self.platforms.add(Ledge(self.platforms, game.input.activePointer.x, game.input.activePointer.y));
+        }
     }
 
 };
@@ -163,10 +177,11 @@ function Player(x, y) {
 
 function Ledge(group,x,y) {
     let ledge = group.create(x, y, 'ground');
+    ledge.scale.setTo(0.5,1);
     ledge.input.enableDrag();
     ledge.input.enableSnap(32,32,true,true);
-    bounds = new Phaser.Rectangle(100, 100, 500, 400);
-    ledge.input.boundsRect = bounds;
+    // bounds = new Phaser.Rectangle(100, 100, 500, 400);
+    // ledge.input.boundsRect = bounds;
 
     return ledge;
 }

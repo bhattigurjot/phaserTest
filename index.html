@@ -4,11 +4,35 @@
     <meta charset="UTF-8">
     <title>Phaser Test</title>
     <script src="js/vendor/phaser.js"></script>
+    <style>
+        .container{
+            display: flex;
+        }
+        #gameDiv{
+            width: 60%;
+        }
+        #treeDiv{
+            flex-grow: 1;
+        }
+    </style>
 
 </head>
 <body>
-    <div id="gameDiv"></div>
+    <div class="container">
+        <div id="gameDiv"></div>
+        <div id="treeDiv">
+            <!--<button onclick="addSprite()">Add Sprite</button>-->
+        </div>
+    </div>
+    <!--<div id="gameDiv"></div>-->
+    <!--<div id="treeDiv"></div>-->
     <script src="js/game.js"></script>
+    <script src="js/tree.js"></script>
     <script src="js/boot.js"></script>
+    <script>
+        function addSprite() {
+            GameState.enablePlaying();
+        }
+    </script>
 </body>
 </html>

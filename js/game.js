@@ -2,8 +2,6 @@
  * Created by Gurjot Bhatti on 5/15/2017.
  */
 
-// let isPlaying = false;
-
 let GameState = {
     player: null,
     platforms: null,
@@ -41,7 +39,7 @@ let GameState = {
         self.playButton = game.add.sprite(700, 10,'play');
         // playButton.scale.setTo(0.25,0.25);
         self.playButton.inputEnabled = true;
-        self.playButton.events.onInputUp.add(this.enablePlaying, this);
+        self.playButton.events.onInputUp.add(self.enablePlaying, self);
 
         // Platforms group
         self.platforms = game.add.group();
@@ -51,27 +49,14 @@ let GameState = {
         // Ground
         self.ground = self.platforms.create(0, game.world.height - 64, 'ground');
         self.ground.scale.setTo(2,2);
-        // ground.body.immovable = false;
 
         // Ledges
-        self.ledge1 = self.platforms.create(400, 400, 'ground');
-        self.ledge1.inputEnabled = true;
-        self.ledge1.input.enableDrag();
-        self.ledge1.input.enableSnap(32,32,true,true);
-        // ledge1.body.immovable = false;
-        self.ledge2 = self.platforms.create(-150, 250, 'ground');
-        // ledge2.body.immovable = false;
+        self.platforms.add(Ledge(self.platforms,100,100));
+        self.platforms.add(Ledge(self.platforms,400,400));
+        self.platforms.add(Ledge(self.platforms,-150,250));
 
         // Player
-        self.player = game.add.sprite(10, 10, 'dude');
-        game.physics.arcade.enable(self.player);
-
-        self.player.body.bounce.y = 0.2;
-        // player.body.gravity.y = 300;
-        self.player.body.collideWorldBounds = true;
-
-        self.player.animations.add('left', [0, 1, 2, 3], 10, true);
-        self.player.animations.add('right', [5, 6, 7, 8], 10, true);
+        self.player = new Player(10,10);
 
         self.cursors = game.input.keyboard.createCursorKeys();
     },
@@ -86,6 +71,7 @@ let GameState = {
         if (self.isPlaying) {
             let hitPlatform = game.physics.arcade.collide(self.player, self.platforms);
 
+            // self.player.stop();
             self.player.body.velocity.x = 0;
 
             if (self.cursors.left.isDown)
@@ -121,22 +107,24 @@ let GameState = {
         self.isPlaying = !self.isPlaying;
 
         if (self.isPlaying) {
-            switchDragging(false, self.ledge1, self.ledge2);
+            switchDragging(false, self.platforms);
             self.playButton.loadTexture('pause');
             self.platforms.enableBody = true;
-            self.ground.body.immovable = true;
-            self.ledge1.body.immovable = true;
-            self.ledge2.body.immovable = true;
+
+            self.platforms.forEach(function (item, index) {
+                item.body.immovable = true;
+            });
+
             self.player.body.moves = true;
             self.player.body.gravity.y = 300;
         } else {
-            reset(self.playButton, self.player, self.ground, self.ledge1, self.ledge2);
+            reset(self.playButton, self.player, self.platforms);
         }
     }
 
 };
 
-function reset(playButton, player, ground, ledge1, ledge2) {
+function reset(playButton, player, ledges) {
     playButton.loadTexture('play');
 
     player.position.x = 10;
@@ -145,21 +133,40 @@ function reset(playButton, player, ground, ledge1, ledge2) {
     player.animations.stop();
     player.frame = 4;
 
-    ground.body.immovable = false;
-    ledge1.body.immovable = false;
-    ledge2.body.immovable = false;
+    ledges.forEach(function (item, index) {
+        item.immovable = false;
+    });
 
-    switchDragging(true,ledge1,ledge2);
+    switchDragging(true,ledges);
 }
 
-function switchDragging(switchDrag, ledge1, ledge2) {
-    ledge1.inputEnabled = switchDrag;
-    ledge2.inputEnabled = switchDrag;
+function switchDragging(switchDrag, ledges) {
+
+    ledges.forEach(function (item, index) {
+        item.inputEnabled = switchDrag;
+    });
+
 }
 
-function addLedge() {
-    ledge = platforms.create(400, 400, 'ground');
-    ledge.inputEnabled = true;
+function Player(x, y) {
+    let player = game.add.sprite(x, y, 'dude');
+    game.physics.arcade.enable(player);
+
+    player.body.bounce.y = 0.2;
+    player.body.collideWorldBounds = true;
+
+    player.animations.add('left', [0, 1, 2, 3], 10, true);
+    player.animations.add('right', [5, 6, 7, 8], 10, true);
+
+    return player;
+}
+
+function Ledge(group,x,y) {
+    let ledge = group.create(x, y, 'ground');
     ledge.input.enableDrag();
     ledge.input.enableSnap(32,32,true,true);
+    bounds = new Phaser.Rectangle(100, 100, 500, 400);
+    ledge.input.boundsRect = bounds;
+
+    return ledge;
 }

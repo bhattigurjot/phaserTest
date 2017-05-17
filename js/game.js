@@ -171,20 +171,38 @@ let GameState = {
     readJSON: function () {
         let self = this;
 
-        if (obj === null) {
+        // if (obj === null) {
+        //     self.platforms.add(Ledge(self.platforms,100,100));
+        //     self.platforms.add(Ledge(self.platforms,400,400));
+        //     self.platforms.add(Ledge(self.platforms,10,250));
+        //     // localStorage.clear();
+        // } else {
+        //     let data = JSON.parse(obj);
+        //
+        //     // console.log(obj);
+        //     // console.log(data.items);
+        //
+        //     for (let i in data.items) {
+        //         self.platforms.add(Ledge(self.platforms,data.items[i].x,data.items[i].y));
+        //     }
+        // }
+
+        if (phaserJSON === null) {
             self.platforms.add(Ledge(self.platforms,100,100));
             self.platforms.add(Ledge(self.platforms,400,400));
             self.platforms.add(Ledge(self.platforms,10,250));
-            // localStorage.clear();
         } else {
-            let data = JSON.parse(obj);
+            currentWorkingNode = 1;
 
-            // console.log(obj);
-            // console.log(data.items);
+            phaserJSON.versions.forEach(function (item) {
+                if (item.id === currentWorkingNode) {
+                    console.log(item.items);
+                    item.items.forEach(function (i) {
+                        self.platforms.add(Ledge(self.platforms,i.x,i.y));
+                    });
+                }
 
-            for (let i in data.items) {
-                self.platforms.add(Ledge(self.platforms,data.items[i].x,data.items[i].y));
-            }
+            });
         }
 
     }

@@ -13,6 +13,7 @@ let GameState = {
     cursors: null,
     playButton: null,
     isPlaying: false,
+    sKey: null,
 
     preload: function () {
         game.load.image('play', 'assets/images/play.png');
@@ -27,17 +28,37 @@ let GameState = {
     create: function() {
         let self = this;
 
+        // Enable advanced timing to display FPS
+        game.time.advancedTiming = true;
+
+        // Read into json object
         phaserJSON = game.cache.getJSON('versions');
-        // console.log(phaserJSON);
 
         // Input
         self.cursors = game.input.keyboard.createCursorKeys();
         game.input.mouse.capture = true;
 
+        sKey = game.input.keyboard.addKey(Phaser.Keyboard.S);
+        sKey.onDown.add(self.writeJSON, self);
+
         // Disable right click context meny
         game.canvas.oncontextmenu = function (e) {
             e.preventDefault();
         };
+
+        // document.onkeydown = function (e) {
+        //     e = e || window.event;//Get event
+        //     if (e.ctrlKey) {
+        //         var c = e.which || e.keyCode;//Get key code
+        //         switch (c) {
+        //             case 83://Block Ctrl+S
+        //             case 87://Block Ctrl+W --Not work in Chrome
+        //                 e.preventDefault();
+        //                 e.stopPropagation();
+        //                 break;
+        //         }
+        //     }
+        // };
 
         // Physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -70,12 +91,12 @@ let GameState = {
         // localStorage.clear();
         this.readJSON();
 
-        // Draw Tree View
-        drawTree();
-
         // Player
         self.player = new Player(10,10);
 
+
+        // Draw Tree View
+        drawTree();
     },
 
     update: function () {
@@ -113,6 +134,10 @@ let GameState = {
                 self.player.body.velocity.y = -350;
             }
         }
+    },
+
+    render: function () {
+        game.debug.text("FPS:" + game.time.fps, 2, 14, "#000000");
     },
     
     enablePlaying: function () {
@@ -163,7 +188,7 @@ let GameState = {
 
         data += ']}';
 
-        // console.log(data);
+        console.log(data);
 
         localStorage.setItem('all-items', data);
     },
@@ -196,7 +221,7 @@ let GameState = {
 
             phaserJSON.versions.forEach(function (item) {
                 if (item.id === currentWorkingNode) {
-                    console.log(item.items);
+                    // console.log(item.items);
                     item.items.forEach(function (i) {
                         self.platforms.add(Ledge(self.platforms,i.x,i.y));
                     });

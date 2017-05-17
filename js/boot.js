@@ -3,13 +3,14 @@
  */
 
 let gameDiv = document.getElementById('gameDiv');
-let treeDiv = document.getElementById('gameDiv');
+let treeDiv = document.getElementById('treeDiv');
 
 let game = new Phaser.Game('100%', 600, Phaser.AUTO, 'gameDiv');
-let tree = new Phaser.Game(treeDiv.clientWidth * window.devicePixelRatio, 600, Phaser.AUTO, 'treeDiv');
+// let tree = new Phaser.Game(treeDiv.clientWidth * window.devicePixelRatio, 600, Phaser.AUTO, 'treeDiv');
 
 game.state.add('gameStart', GameState);
 game.state.start('gameStart');
 
-tree.state.add('treeStart', TreeState);
-tree.state.start('treeStart');
+// tree.state.add('treeStart', TreeState);
+// tree.state.start('treeStart');
+

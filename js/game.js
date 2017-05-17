@@ -2,13 +2,14 @@
  * Created by Gurjot Bhatti on 5/15/2017.
  */
 
+let obj = localStorage.getItem('all-items');
+let phaserJSON = null;
+
 let GameState = {
     player: null,
     background: null,
     platforms: null,
     ground: null,
-    ledge1: null,
-    ledge2: null,
     cursors: null,
     playButton: null,
     isPlaying: false,
@@ -19,11 +20,15 @@ let GameState = {
         game.load.image('sky', 'assets/images/sky.png');
         game.load.image('ground', 'assets/images/platform.png');
         game.load.image('star', 'assets/images/star.png');
+        game.load.json('versions', 'assets/save.json');
         game.load.spritesheet('dude', 'assets/images/dude.png', 32, 48);
     },
 
     create: function() {
         let self = this;
+
+        phaserJSON = game.cache.getJSON('versions');
+        // console.log(phaserJSON);
 
         // Input
         self.cursors = game.input.keyboard.createCursorKeys();
@@ -54,13 +59,19 @@ let GameState = {
         self.platforms.inputEnableChildren = true;
 
         // Ground
-        self.ground = self.platforms.create(0, game.world.height - 64, 'ground');
+        // self.ground = self.platforms.create(0, game.world.height - 64, 'ground');
+        self.ground = game.add.sprite(0, game.world.height - 64, 'ground');
+        game.physics.arcade.enable(self.ground);
         self.ground.scale.setTo(2,2);
+        self.ground.enableBody = true;
+        self.ground.body.immovable = true;
 
-        // Ledges
-        self.platforms.add(Ledge(self.platforms,100,100));
-        self.platforms.add(Ledge(self.platforms,400,400));
-        self.platforms.add(Ledge(self.platforms,10,250));
+        // Ledges - drawn from local storage
+        // localStorage.clear();
+        this.readJSON();
+
+        // Draw Tree View
+        drawTree();
 
         // Player
         self.player = new Player(10,10);
@@ -70,12 +81,9 @@ let GameState = {
     update: function () {
         let self = this;
 
-        // if (game.input.activePointer.rightButton.isDown) {
-        //     addLedge(self.platforms);
-        // }
-
         if (self.isPlaying) {
             let hitPlatform = game.physics.arcade.collide(self.player, self.platforms);
+            let hitGround = game.physics.arcade.collide(self.player, self.ground);
 
             // self.player.stop();
             self.player.body.velocity.x = 0;
@@ -99,8 +107,8 @@ let GameState = {
                 self.player.frame = 4;
             }
 
-            //  Allow the player to jump if they are touching the ground.
-            if (self.cursors.up.isDown && self.player.body.touching.down && hitPlatform)
+            //  Allow the player to jump if they are touching the ground or platform.
+            if (self.cursors.up.isDown && self.player.body.touching.down && (hitPlatform || hitGround))
             {
                 self.player.body.velocity.y = -350;
             }
@@ -126,6 +134,8 @@ let GameState = {
         } else {
             reset(self.playButton, self.player, self.platforms);
         }
+
+        self.writeJSON();
     },
 
     addLedge: function (background, pointer) {
@@ -134,6 +144,49 @@ let GameState = {
         // if (game.input.activePointer.rightButton.isDown) {
             self.platforms.add(Ledge(self.platforms, game.input.activePointer.x, game.input.activePointer.y));
         }
+    },
+
+    writeJSON: function () {
+        let self = this;
+
+        let data, text, iter;
+
+        data = '{"items":[';
+        self.platforms.forEach(function(item,index) {
+            // iter = index;
+            text = '{"x":'+ item.x + ', "y":'+ item.y + '}';
+            data += text + ", ";
+            // console.log(self.platforms.length);
+        });
+
+        data = data.substring(0, data.length - 2);
+
+        data += ']}';
+
+        // console.log(data);
+
+        localStorage.setItem('all-items', data);
+    },
+
+    readJSON: function () {
+        let self = this;
+
+        if (obj === null) {
+            self.platforms.add(Ledge(self.platforms,100,100));
+            self.platforms.add(Ledge(self.platforms,400,400));
+            self.platforms.add(Ledge(self.platforms,10,250));
+            // localStorage.clear();
+        } else {
+            let data = JSON.parse(obj);
+
+            // console.log(obj);
+            // console.log(data.items);
+
+            for (let i in data.items) {
+                self.platforms.add(Ledge(self.platforms,data.items[i].x,data.items[i].y));
+            }
+        }
+
     }
 
 };
@@ -180,8 +233,6 @@ function Ledge(group,x,y) {
     ledge.scale.setTo(0.5,1);
     ledge.input.enableDrag();
     ledge.input.enableSnap(32,32,true,true);
-    // bounds = new Phaser.Rectangle(100, 100, 500, 400);
-    // ledge.input.boundsRect = bounds;
 
     return ledge;
 }

@@ -16,33 +16,34 @@ let edges = new vis.DataSet();
 // create a tree-network
 let container = document.getElementById('treeDiv');
 
+// provide the data in the vis format
+data = {
+    nodes: nodes,
+    edges: edges
+};
+options = {
+    edges: {
+        smooth: {
+            type: 'cubicBezier',
+            // forceDirection: 'horizontal',
+            roundness: 0.4
+        }
+    },
+    layout: {
+        hierarchical: {
+            direction: 'UD'
+        }
+    },
+    physics: false
+};
+
 // This draws tree on the screen
-function drawTree() {
+function drawTree(phaserJSON) {
     destroyTree();
 
     // get total number of nodes from json
     totalNodes = phaserJSON.versions.length;
-
-    // provide the data in the vis format
-    data = {
-        nodes: nodes,
-        edges: edges
-    };
-    options = {
-        edges: {
-            smooth: {
-                type: 'cubicBezier',
-                // forceDirection: 'horizontal',
-                roundness: 0.4
-            }
-        },
-        layout: {
-            hierarchical: {
-                direction: 'UD'
-            }
-        },
-        physics: false
-    };
+    console.log(totalNodes);
 
     // Add nodes
     phaserJSON.versions.forEach(function (item) {
@@ -51,10 +52,13 @@ function drawTree() {
 
     // Add edges between nodes
     phaserJSON.versions.forEach(function (item) {
-        if (item.children) {
-            item.children.forEach(function (i) {
-                edges.add({from: i, to: item.id});
-            });
+        // if (item.children) {
+        //     item.children.forEach(function (i) {
+        //         edges.add({from: i, to: item.id});
+        //     });
+        // }
+        if (item.parent) {
+            edges.add({from: item.parent, to: item.id});
         }
     });
 
@@ -69,6 +73,10 @@ function drawTree() {
 
 // Destroy the tree-network
 function destroyTree() {
+    // Clear nodes and edges data
+    nodes.clear();
+    edges.clear();
+
     if (network === null) {
     } else {
         network.destroy();

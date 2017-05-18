@@ -3,7 +3,7 @@
  */
 
 // let obj = localStorage.getItem('all-items');
-let phaserJSON = null;
+// let phaserJSON = null;
 Client.requestDataFromJSON();
 
 let GameState = {
@@ -15,6 +15,8 @@ let GameState = {
     playButton: null,
     isPlaying: false,
     sKey: null,
+    phaserJSON: null,
+    currentVersion: null,
 
     preload: function () {
         game.load.image('play', 'assets/images/play.png');
@@ -84,7 +86,7 @@ let GameState = {
         self.player = new Player(10,10);
 
         // Draw Tree View
-        drawTree();
+        drawTree(phaserJSON);
     },
 
     update: function () {
@@ -166,21 +168,37 @@ let GameState = {
     writeJSON: function () {
         let self = this;
 
-        let data, text, iter;
+        // let data, text, iter;
 
-        data = '{"items":[';
-        self.platforms.forEach(function(item,index) {
-            text = '{"x":'+ item.x + ', "y":'+ item.y + '}';
-            data += text + ", ";
-        });
-        data = data.substring(0, data.length - 2);
-        data += ']}';
-
-        console.log(phaserJSON);
-        // phaserJSON.versions
+        // data = '{"items":[';
+        // self.platforms.forEach(function(item,index) {
+        //     text = '{"x":'+ item.x + ', "y":'+ item.y + '}';
+        //     data += text + ", ";
+        // });
+        // data = data.substring(0, data.length - 2);
+        // data += ']}';
 
         // localStorage.setItem('all-items', data);
-        // Client.saveToJSON(data);
+
+        arr = [];
+
+        self.platforms.forEach(function(item,index) {
+            temp = {};
+            temp.x = item.x;
+            temp.y = item.y;
+            arr.push(temp);
+        });
+
+        totalVersions = phaserJSON.versions.length;
+
+        phaserJSON.versions.push({
+            "id":(totalVersions + 1),
+            "parent":self.currentVersion,
+            "items":arr
+        });
+
+        Client.saveToJSON(phaserJSON);
+        drawTree(phaserJSON);
     },
 
     readJSONAndChangeVersion: function (id = 1) {
@@ -191,13 +209,14 @@ let GameState = {
 
         // read json file and draws ledges on screen
         if (phaserJSON === null) {
+            self.currentVersion = 1;
             self.platforms.add(Ledge(self.platforms,100,100));
             self.platforms.add(Ledge(self.platforms,400,400));
             self.platforms.add(Ledge(self.platforms,10,250));
         } else {
-            currentWorkingNode = id;
+            self.currentVersion = id;
             phaserJSON.versions.forEach(function (item) {
-                if (item.id === currentWorkingNode) {
+                if (item.id === self.currentVersion) {
                     // console.log(item.items);
                     item.items.forEach(function (i) {
                         self.platforms.add(Ledge(self.platforms,i.x,i.y));

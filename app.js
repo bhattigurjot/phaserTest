@@ -21,7 +21,7 @@ function readJSONFile() {
     });
 }
 function writeJSONFile(data) {
-    fs.writeFile('versions/save.json', data, 'utf8', function (err) {
+    fs.writeFile('versions/save.json', JSON.stringify(data), 'utf8', function (err) {
         if (err) throw err;
     });
 }
@@ -44,7 +44,6 @@ io.on('connection', function (socket) {
         io.emit('jsonData', dataJSON);
     });
     socket.on('saveJsonData', function (data) {
-        // io.emit('jsonData', dataJSON);
         writeJSONFile(data);
     });
 });

@@ -2,8 +2,9 @@
  * Created by Gurjot Bhatti on 5/15/2017.
  */
 
-let obj = localStorage.getItem('all-items');
+// let obj = localStorage.getItem('all-items');
 let phaserJSON = null;
+Client.requestDataFromJSON();
 
 let GameState = {
     player: null,
@@ -21,7 +22,7 @@ let GameState = {
         game.load.image('sky', 'assets/images/sky.png');
         game.load.image('ground', 'assets/images/platform.png');
         game.load.image('star', 'assets/images/star.png');
-        game.load.json('versions', 'assets/save.json');
+        // game.load.json('versions', 'assets/save.json');
         game.load.spritesheet('dude', 'assets/images/dude.png', 32, 48);
     },
 
@@ -32,7 +33,8 @@ let GameState = {
         game.time.advancedTiming = true;
 
         // Read into json object
-        phaserJSON = game.cache.getJSON('versions');
+        // phaserJSON = game.cache.getJSON('versions');
+        phaserJSON = Client.dataJSON;
 
         // Input
         self.cursors = game.input.keyboard.createCursorKeys();
@@ -41,24 +43,10 @@ let GameState = {
         sKey = game.input.keyboard.addKey(Phaser.Keyboard.S);
         sKey.onDown.add(self.writeJSON, self);
 
-        // Disable right click context meny
+        // Disable right click context menu
         game.canvas.oncontextmenu = function (e) {
             e.preventDefault();
         };
-
-        // document.onkeydown = function (e) {
-        //     e = e || window.event;//Get event
-        //     if (e.ctrlKey) {
-        //         var c = e.which || e.keyCode;//Get key code
-        //         switch (c) {
-        //             case 83://Block Ctrl+S
-        //             case 87://Block Ctrl+W --Not work in Chrome
-        //                 e.preventDefault();
-        //                 e.stopPropagation();
-        //                 break;
-        //         }
-        //     }
-        // };
 
         // Physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -87,13 +75,13 @@ let GameState = {
         self.ground.enableBody = true;
         self.ground.body.immovable = true;
 
-        // Ledges - drawn from local storage
+        // Ledges - drawn after reading JSON file and according to correct version
+        self.readJSONAndChangeVersion();
         // localStorage.clear();
-        this.readJSON();
+        // self.readJSON();
 
         // Player
         self.player = new Player(10,10);
-
 
         // Draw Tree View
         drawTree();
@@ -137,36 +125,40 @@ let GameState = {
     },
 
     render: function () {
+        // Displays FPS on screen
         game.debug.text("FPS:" + game.time.fps, 2, 14, "#000000");
     },
     
     enablePlaying: function () {
         let self = this;
-        // game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        // Flip the boolean value for playing condition
         self.isPlaying = !self.isPlaying;
 
         if (self.isPlaying) {
             switchDragging(false, self.platforms);
+            // Change button texture to pause
             self.playButton.loadTexture('pause');
+            // enable physics body on all ledges and make them immovable
             self.platforms.enableBody = true;
-
             self.platforms.forEach(function (item, index) {
                 item.body.immovable = true;
             });
 
+            // Allows player to move and add gravity to player
             self.player.body.moves = true;
             self.player.body.gravity.y = 300;
         } else {
+            // Resets scene
             reset(self.playButton, self.player, self.platforms);
         }
-
-        self.writeJSON();
     },
 
     addLedge: function (background, pointer) {
         let self = this;
+
+        // Right click to place ledge on screen
         if (pointer.rightButton.isDown && !self.isPlaying) {
-        // if (game.input.activePointer.rightButton.isDown) {
             self.platforms.add(Ledge(self.platforms, game.input.activePointer.x, game.input.activePointer.y));
         }
     },
@@ -178,47 +170,32 @@ let GameState = {
 
         data = '{"items":[';
         self.platforms.forEach(function(item,index) {
-            // iter = index;
             text = '{"x":'+ item.x + ', "y":'+ item.y + '}';
             data += text + ", ";
-            // console.log(self.platforms.length);
         });
-
         data = data.substring(0, data.length - 2);
-
         data += ']}';
 
-        console.log(data);
+        console.log(phaserJSON);
+        // phaserJSON.versions
 
-        localStorage.setItem('all-items', data);
+        // localStorage.setItem('all-items', data);
+        // Client.saveToJSON(data);
     },
 
-    readJSON: function () {
+    readJSONAndChangeVersion: function (id = 1) {
         let self = this;
 
-        // if (obj === null) {
-        //     self.platforms.add(Ledge(self.platforms,100,100));
-        //     self.platforms.add(Ledge(self.platforms,400,400));
-        //     self.platforms.add(Ledge(self.platforms,10,250));
-        //     // localStorage.clear();
-        // } else {
-        //     let data = JSON.parse(obj);
-        //
-        //     // console.log(obj);
-        //     // console.log(data.items);
-        //
-        //     for (let i in data.items) {
-        //         self.platforms.add(Ledge(self.platforms,data.items[i].x,data.items[i].y));
-        //     }
-        // }
+        // deletes all the ledges
+        self.platforms.removeAll(true);
 
+        // read json file and draws ledges on screen
         if (phaserJSON === null) {
             self.platforms.add(Ledge(self.platforms,100,100));
             self.platforms.add(Ledge(self.platforms,400,400));
             self.platforms.add(Ledge(self.platforms,10,250));
         } else {
-            currentWorkingNode = 1;
-
+            currentWorkingNode = id;
             phaserJSON.versions.forEach(function (item) {
                 if (item.id === currentWorkingNode) {
                     // console.log(item.items);
@@ -229,12 +206,13 @@ let GameState = {
 
             });
         }
-
     }
 
 };
 
+// This resets the player position and makes ledges movable
 function reset(playButton, player, ledges) {
+    // change the playbutton texture to play
     playButton.loadTexture('play');
 
     player.position.x = 10;
@@ -250,32 +228,48 @@ function reset(playButton, player, ledges) {
     switchDragging(true,ledges);
 }
 
+// This toggles the dragging of sprites
 function switchDragging(switchDrag, ledges) {
-
     ledges.forEach(function (item, index) {
         item.inputEnabled = switchDrag;
     });
 
 }
 
+// This deletes the ledge sprite on which middle mouse is clicked
+function destroySprite(sprite, pointer) {
+    if (pointer.middleButton.isDown && !self.isPlaying) {
+        sprite.destroy();
+    }
+}
+
+// Player Factory function
 function Player(x, y) {
     let player = game.add.sprite(x, y, 'dude');
-    game.physics.arcade.enable(player);
 
+    // Physics and options
+    game.physics.arcade.enable(player);
     player.body.bounce.y = 0.2;
     player.body.collideWorldBounds = true;
 
+    // Player's animations
     player.animations.add('left', [0, 1, 2, 3], 10, true);
     player.animations.add('right', [5, 6, 7, 8], 10, true);
 
     return player;
 }
 
+// Ledge Factory function
 function Ledge(group,x,y) {
     let ledge = group.create(x, y, 'ground');
     ledge.scale.setTo(0.5,1);
+
+    // Enable dragging and snapping
     ledge.input.enableDrag();
     ledge.input.enableSnap(32,32,true,true);
+
+    // bind function to destroy the ledge
+    ledge.events.onInputDown.add(destroySprite, this);
 
     return ledge;
 }

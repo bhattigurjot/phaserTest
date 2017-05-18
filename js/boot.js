@@ -11,6 +11,8 @@ let game = new Phaser.Game('100%', 600, Phaser.AUTO, 'gameDiv');
 game.state.add('gameStart', GameState);
 game.state.start('gameStart');
 
+Client.sendTest();
+
 // tree.state.add('treeStart', TreeState);
 // tree.state.start('treeStart');
 

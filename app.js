@@ -3,20 +3,48 @@
  */
 const express = require('express');
 const app = express();
+const server = require('http').Server(app);
 const port = 3000;
-
+const io = require('socket.io').listen(server);
 const fs = require('fs');
 
-app.get('/', (request, response) => {
-    response.render('index',fs);
-});
+let dataJSON = null;
 
-console.log("Starting server in: " + __dirname + '/');
+readJSONFile();
+// writeJSONFile();
+
+function readJSONFile() {
+    // Read the file and send to the callback
+    fs.readFile('versions/save.json', function (err, data) {
+        if (err) throw err;
+        dataJSON = JSON.parse(data);
+    });
+}
+function writeJSONFile(data) {
+    fs.writeFile('versions/save.json', data, 'utf8', function (err) {
+        if (err) throw err;
+    });
+}
+
 app.use(express.static(__dirname + '/'));
 
-app.listen(port, (err) => {
-    if (err) {
-        return console.log('something bad happened', err)
-    }
-    console.log(`server is listening on ${port}`)
+app.get('/', (request, response) => {
+    response.send(__dirname+'/index.html');
+});
+
+server.listen(port, function () {
+    console.log('Listening on ' + server.address().port);
+});
+
+io.on('connection', function (socket) {
+    socket.on('test', function () {
+        console.log('test successful');
+    });
+    socket.on('getJsonData', function () {
+        io.emit('jsonData', dataJSON);
+    });
+    socket.on('saveJsonData', function (data) {
+        // io.emit('jsonData', dataJSON);
+        writeJSONFile(data);
+    });
 });

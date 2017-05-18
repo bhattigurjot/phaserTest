@@ -13,12 +13,14 @@ let nodes = new vis.DataSet();
 // create an array with edges
 let edges = new vis.DataSet();
 
-// create a network
+// create a tree-network
 let container = document.getElementById('treeDiv');
 
+// This draws tree on the screen
 function drawTree() {
-    destroy();
+    destroyTree();
 
+    // get total number of nodes from json
     totalNodes = phaserJSON.versions.length;
 
     // provide the data in the vis format
@@ -42,32 +44,34 @@ function drawTree() {
         physics: false
     };
 
+    // Add nodes
     phaserJSON.versions.forEach(function (item) {
         nodes.add({id: item.id, label: 'Node ' + item.id});
     });
 
+    // Add edges between nodes
     phaserJSON.versions.forEach(function (item) {
         if (item.children) {
-            // console.log(item.children);
             item.children.forEach(function (i) {
-                // console.log(i);
                 edges.add({from: i, to: item.id});
             });
         }
-
     });
 
-    // initialize your network!
+    // initialize the tree-network!
     network = new vis.Network(container, data, options);
+
+    // Double click event to change the version
+    network.on("doubleClick", function (params) {
+        GameState.readJSONAndChangeVersion(params.nodes[0]);
+    });
 }
 
-function destroy() {
+// Destroy the tree-network
+function destroyTree() {
     if (network === null) {
     } else {
         network.destroy();
         network = null;
     }
 }
-
-// nodes.add({id: item.id, label: 'Node ' + item.id, items:[{"x":100, "y":100}, {"x":400, "y":400}, {"x":0, "y":256}]});
-// edges.add({from: item.id, to: item.children[0]});

@@ -59,7 +59,7 @@ let GameState = {
         self.background.events.onInputDown.add(self.addLedge, self);
 
         // Play button
-        self.playButton = game.add.sprite(700, 10,'play');
+        self.playButton = game.add.sprite(100, 15,'play');
         // playButton.scale.setTo(0.25,0.25);
         self.playButton.inputEnabled = true;
         self.playButton.events.onInputUp.add(self.enablePlaying, self);
@@ -124,6 +124,9 @@ let GameState = {
                 self.player.body.velocity.y = -350;
             }
         }
+
+        // Display current version on screen
+        game.debug.text("Current Version:" + self.currentVersion, 72, 14, "#000000");
     },
 
     render: function () {

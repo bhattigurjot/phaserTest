@@ -6,6 +6,9 @@ let totalNodes = null;
 let data = null;
 let options = null;
 let network = null;
+let currNode = null;
+const DEFAULT_COLOR = '#70f36c';
+const HIGHLIGHTED_COLOR = '#f36c3f';
 
 // create an array with edges
 let nodes = new vis.DataSet();
@@ -43,11 +46,12 @@ function drawTree(phaserJSON) {
 
     // get total number of nodes from json
     totalNodes = phaserJSON.versions.length;
-    console.log(totalNodes);
+    currNode = 1;
+    // console.log(totalNodes);
 
     // Add nodes
     phaserJSON.versions.forEach(function (item) {
-        nodes.add({id: item.id, label: 'Node ' + item.id});
+        nodes.add({id: item.id, label: 'Node ' + item.id, borderWidth: 1, color: DEFAULT_COLOR});
     });
 
     // Add edges between nodes
@@ -67,7 +71,31 @@ function drawTree(phaserJSON) {
 
     // Double click event to change the version
     network.on("doubleClick", function (params) {
-        GameState.readJSONAndChangeVersion(params.nodes[0]);
+
+        // check if the value is null or not
+        if (params.nodes[0]) {
+            currNode = params.nodes[0];
+        }
+        GameState.readJSONAndChangeVersion(currNode);
+    });
+
+    // Set color before drawing the tree
+    network.on("beforeDrawing", function (params) {
+
+        // set the color of all other nodes
+        for (i in network.body.nodes) {
+            let n = network.body.nodes[i];
+            n.setOptions({
+                color: DEFAULT_COLOR
+            });
+        }
+
+        // set the color of selected node
+        let n = network.body.nodes[currNode];
+        n.setOptions({
+            color: HIGHLIGHTED_COLOR
+        });
+
     });
 }
 

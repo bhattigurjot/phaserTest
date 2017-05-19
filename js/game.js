@@ -194,10 +194,10 @@ let GameState = {
 
         // Make sure to save only if the current version is different from the previous version
         phaserJSON.versions.forEach(function (item) {
-            if (item.id === self.currentVersion) {
+            if (item.id === self.currentVersion && !self.isPlaying) {
 
                 // CHeck if both versions are equal or not
-                if (JSON.stringify(arr) != JSON.stringify(item.items)) {
+                if (JSON.stringify(arr) !== JSON.stringify(item.items)) {
                     let totalVersions = phaserJSON.versions.length;
 
                     phaserJSON.versions.push({

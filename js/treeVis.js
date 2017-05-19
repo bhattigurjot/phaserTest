@@ -92,7 +92,6 @@ function drawTree(phaserJSON) {
 
             // set the color of selected node
             let n = network.body.nodes[currNode];
-            console.log(n);
             n.setOptions({
                 color: HIGHLIGHTED_COLOR
             });

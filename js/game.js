@@ -192,17 +192,29 @@ let GameState = {
             arr.push(temp);
         });
 
-        totalVersions = phaserJSON.versions.length;
+        // Make sure to save only if the current version is different from the previous version
+        phaserJSON.versions.forEach(function (item) {
+            if (item.id === self.currentVersion) {
 
-        phaserJSON.versions.push({
-            "id":(totalVersions + 1),
-            "parent":self.currentVersion,
-            "items":arr
+                // CHeck if both versions are equal or not
+                if (JSON.stringify(arr) != JSON.stringify(item.items)) {
+                    let totalVersions = phaserJSON.versions.length;
+
+                    phaserJSON.versions.push({
+                        "id":(totalVersions + 1),
+                        "parent":self.currentVersion,
+                        "items":arr
+                    });
+
+                    self.currentVersion = totalVersions + 1;
+
+                    Client.saveToJSON(phaserJSON);
+                    changeVersion(self.currentVersion);
+                    drawTree(phaserJSON);
+                }
+            }
         });
 
-        Client.saveToJSON(phaserJSON);
-        changeVersion(self.currentVersion);
-        drawTree(phaserJSON);
     },
 
     readJSONAndChangeVersion: function (id = 1) {

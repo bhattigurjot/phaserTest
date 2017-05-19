@@ -46,7 +46,7 @@ function drawTree(phaserJSON) {
 
     // get total number of nodes from json
     totalNodes = phaserJSON.versions.length;
-    currNode = 1;
+    currNode = totalNodes;
     // console.log(totalNodes);
 
     // Add nodes
@@ -81,20 +81,22 @@ function drawTree(phaserJSON) {
 
     // Set color before drawing the tree
     network.on("beforeDrawing", function (params) {
+        if (nodes.length > 0) {
+            // set the color of all other nodes
+            for (i in network.body.nodes) {
+                let n = network.body.nodes[i];
+                n.setOptions({
+                    color: DEFAULT_COLOR
+                });
+            }
 
-        // set the color of all other nodes
-        for (i in network.body.nodes) {
-            let n = network.body.nodes[i];
+            // set the color of selected node
+            let n = network.body.nodes[currNode];
+            console.log(n);
             n.setOptions({
-                color: DEFAULT_COLOR
+                color: HIGHLIGHTED_COLOR
             });
         }
-
-        // set the color of selected node
-        let n = network.body.nodes[currNode];
-        n.setOptions({
-            color: HIGHLIGHTED_COLOR
-        });
 
     });
 }
@@ -110,4 +112,8 @@ function destroyTree() {
         network.destroy();
         network = null;
     }
+}
+
+function changeVersion(val) {
+    currNode = val;
 }

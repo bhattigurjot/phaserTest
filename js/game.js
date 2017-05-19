@@ -78,9 +78,9 @@ let GameState = {
         self.ground.body.immovable = true;
 
         // Ledges - drawn after reading JSON file and according to correct version
-        self.readJSONAndChangeVersion();
+        totalVersions = phaserJSON.versions.length;
+        self.readJSONAndChangeVersion(totalVersions);
         // localStorage.clear();
-        // self.readJSON();
 
         // Player
         self.player = new Player(10,10);
@@ -201,6 +201,7 @@ let GameState = {
         });
 
         Client.saveToJSON(phaserJSON);
+        changeVersion(self.currentVersion);
         drawTree(phaserJSON);
     },
 
@@ -220,7 +221,6 @@ let GameState = {
             self.currentVersion = id;
             phaserJSON.versions.forEach(function (item) {
                 if (item.id === self.currentVersion) {
-                    // console.log(item.items);
                     item.items.forEach(function (i) {
                         self.platforms.add(Ledge(self.platforms,i.x,i.y));
                     });

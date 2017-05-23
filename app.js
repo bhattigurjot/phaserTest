@@ -1,6 +1,9 @@
 /**
  * Created by Gurjot Bhatti on 5/17/2017.
  */
+
+"use strict";
+
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);

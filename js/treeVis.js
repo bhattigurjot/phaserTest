@@ -2,6 +2,8 @@
  * Created by Gurjot Bhatti on 5/15/2017.
  */
 
+"use strict";
+
 let totalNodes = null;
 let data = null;
 let options = null;
@@ -83,7 +85,7 @@ function drawTree(phaserJSON) {
     network.on("beforeDrawing", function (params) {
         if (nodes.length > 0) {
             // set the color of all other nodes
-            for (i in network.body.nodes) {
+            for (let i in network.body.nodes) {
                 let n = network.body.nodes[i];
                 n.setOptions({
                     color: DEFAULT_COLOR

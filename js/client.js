@@ -1,6 +1,8 @@
 /**
  * Created by Gurjot Bhatti on 5/18/2017.
  */
+"use strict";
+
 let Client = {};
 Client.socket = io.connect();
 Client.dataJSON = null;

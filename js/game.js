@@ -2,6 +2,8 @@
  * Created by Gurjot Bhatti on 5/15/2017.
  */
 
+"use strict";
+
 // let obj = localStorage.getItem('all-items');
 // let phaserJSON = null;
 Client.requestDataFromJSON();
@@ -16,6 +18,7 @@ let GameState = {
     isPlaying: false,
     sKey: null,
     phaserJSON: null,
+    totalVersions: null,
     currentVersion: null,
 
     preload: function () {
@@ -36,14 +39,14 @@ let GameState = {
 
         // Read into json object
         // phaserJSON = game.cache.getJSON('versions');
-        phaserJSON = Client.dataJSON;
+        self.phaserJSON = Client.dataJSON;
 
         // Input
         self.cursors = game.input.keyboard.createCursorKeys();
         game.input.mouse.capture = true;
 
-        sKey = game.input.keyboard.addKey(Phaser.Keyboard.S);
-        sKey.onDown.add(self.writeJSON, self);
+        self.sKey = game.input.keyboard.addKey(Phaser.Keyboard.S);
+        self.sKey.onDown.add(self.writeJSON, self);
 
         // Disable right click context menu
         game.canvas.oncontextmenu = function (e) {
@@ -78,15 +81,15 @@ let GameState = {
         self.ground.body.immovable = true;
 
         // Ledges - drawn after reading JSON file and according to correct version
-        totalVersions = phaserJSON.versions.length;
-        self.readJSONAndChangeVersion(totalVersions);
+        self.totalVersions = self.phaserJSON.versions.length;
+        self.readJSONAndChangeVersion(self.totalVersions);
         // localStorage.clear();
 
         // Player
         self.player = new Player(10,10);
 
         // Draw Tree View
-        drawTree(phaserJSON);
+        drawTree(self.phaserJSON);
     },
 
     update: function () {
@@ -183,34 +186,34 @@ let GameState = {
 
         // localStorage.setItem('all-items', data);
 
-        arr = [];
+        let arr = [];
 
         self.platforms.forEach(function(item,index) {
-            temp = {};
+            let temp = {};
             temp.x = item.x;
             temp.y = item.y;
             arr.push(temp);
         });
 
         // Make sure to save only if the current version is different from the previous version
-        phaserJSON.versions.forEach(function (item) {
+        self.phaserJSON.versions.forEach(function (item) {
             if (item.id === self.currentVersion && !self.isPlaying) {
 
                 // CHeck if both versions are equal or not
                 if (JSON.stringify(arr) !== JSON.stringify(item.items)) {
-                    let totalVersions = phaserJSON.versions.length;
+                    let totalVersions = self.phaserJSON.versions.length;
 
-                    phaserJSON.versions.push({
-                        "id":(totalVersions + 1),
+                    self.phaserJSON.versions.push({
+                        "id":(self.totalVersions + 1),
                         "parent":self.currentVersion,
                         "items":arr
                     });
 
-                    self.currentVersion = totalVersions + 1;
+                    self.currentVersion = self.totalVersions + 1;
 
-                    Client.saveToJSON(phaserJSON);
+                    Client.saveToJSON(self.phaserJSON);
                     changeVersion(self.currentVersion);
-                    drawTree(phaserJSON);
+                    drawTree(self.phaserJSON);
                 }
             }
         });
@@ -224,14 +227,14 @@ let GameState = {
         self.platforms.removeAll(true);
 
         // read json file and draws ledges on screen
-        if (phaserJSON === null) {
+        if (self.phaserJSON === null) {
             self.currentVersion = 1;
             self.platforms.add(Ledge(self.platforms,100,100));
             self.platforms.add(Ledge(self.platforms,400,400));
             self.platforms.add(Ledge(self.platforms,10,250));
         } else {
             self.currentVersion = id;
-            phaserJSON.versions.forEach(function (item) {
+            self.phaserJSON.versions.forEach(function (item) {
                 if (item.id === self.currentVersion) {
                     item.items.forEach(function (i) {
                         self.platforms.add(Ledge(self.platforms,i.x,i.y));

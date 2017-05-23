@@ -10,7 +10,7 @@ let options = null;
 let network = null;
 let currNode = null;
 const DEFAULT_COLOR = '#70f36c';
-const HIGHLIGHTED_COLOR = '#f36c3f';
+const HIGHLIGHTED_COLOR = '#f3ac4f';
 
 // create an array with edges
 let nodes = new vis.DataSet();
@@ -39,6 +39,9 @@ options = {
             direction: 'UD'
         }
     },
+    interaction:{
+        navigationButtons: true
+    },
     physics: false
 };
 
@@ -53,7 +56,7 @@ function drawTree(phaserJSON) {
 
     // Add nodes
     phaserJSON.versions.forEach(function (item) {
-        nodes.add({id: item.id, label: 'Node ' + item.id, borderWidth: 1, color: DEFAULT_COLOR});
+        nodes.add({id: item.id, label: 'Node ' + item.id, borderWidth: 1, color: DEFAULT_COLOR, shape: 'box'});
     });
 
     // Add edges between nodes

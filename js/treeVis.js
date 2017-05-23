@@ -84,6 +84,15 @@ function drawTree(phaserJSON) {
         GameState.readJSONAndChangeVersion(currNode);
     });
 
+    // Context menu - right click
+    // network.on('oncontext', function (params) {
+    //     params.event.preventDefault();
+    //     document.getElementById('popupDialog').style.display = 'block';
+    //     document.getElementById('popupDialog').style.top = params.pointer.canvas.y;
+    //     document.getElementById('popupDialog').style.left = params.pointer.canvas.x;
+    //     console.log("context menu", params);
+    // });
+
     // Set color before drawing the tree
     network.on("beforeDrawing", function (params) {
         if (nodes.length > 0) {
@@ -121,3 +130,7 @@ function destroyTree() {
 function changeVersion(val) {
     currNode = val;
 }
+
+// function popupDialogMenu(data) {
+//
+// }

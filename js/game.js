@@ -201,15 +201,15 @@ let GameState = {
 
                 // CHeck if both versions are equal or not
                 if (JSON.stringify(arr) !== JSON.stringify(item.items)) {
-                    let totalVersions = self.phaserJSON.versions.length;
+                    let tV = self.phaserJSON.versions.length;
 
                     self.phaserJSON.versions.push({
-                        "id":(self.totalVersions + 1),
+                        "id":(tV + 1),
                         "parent":self.currentVersion,
                         "items":arr
                     });
 
-                    self.currentVersion = self.totalVersions + 1;
+                    self.currentVersion = tV + 1;
 
                     Client.saveToJSON(self.phaserJSON);
                     changeVersion(self.currentVersion);

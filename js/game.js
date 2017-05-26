@@ -20,6 +20,8 @@ let GameState = {
     phaserJSON: null,
     totalVersions: null,
     currentVersion: null,
+    isSavingLevel: false,
+    isSavingVersion: false,
 
     preload: function () {
         game.load.image('play', 'assets/images/play.png');
@@ -126,6 +128,15 @@ let GameState = {
             {
                 self.player.body.velocity.y = -350;
             }
+        } else {
+            if (game.input.keyboard.isDown(Phaser.Keyboard.CONTROL)) {
+                self.isSavingLevel = true;
+            } else if (game.input.keyboard.isDown(Phaser.Keyboard.ALT)) {
+                self.isSavingVersion = true;
+            } else {
+                self.isSavingLevel = false;
+                self.isSavingVersion = false;
+            }
         }
 
         // Display current version on screen
@@ -197,7 +208,21 @@ let GameState = {
 
         // Make sure to save only if the current version is different from the previous version
         self.phaserJSON.versions.forEach(function (item) {
-            if (item.id === self.currentVersion && !self.isPlaying) {
+            if (item.id === self.currentVersion && !self.isPlaying && self.isSavingLevel) {
+
+                // CHeck if both versions are equal or not
+                if (JSON.stringify(arr) !== JSON.stringify(item.items)) {
+                    let tV = self.phaserJSON.versions.length;
+
+                    // console.log(self.phaserJSON.versions[item.id-1]);
+                    self.phaserJSON.versions[item.id - 1].items = arr;
+                    //
+                    Client.saveToJSON(self.phaserJSON);
+
+                    drawTree(self.phaserJSON);
+                }
+            }
+            if (item.id === self.currentVersion && !self.isPlaying && self.isSavingVersion) {
 
                 // CHeck if both versions are equal or not
                 if (JSON.stringify(arr) !== JSON.stringify(item.items)) {

@@ -12,6 +12,7 @@ let GameState = {
     player: null,
     background: null,
     platforms: null,
+    platforms2: null,
     ground: null,
     cursors: null,
     playButton: null,
@@ -86,6 +87,9 @@ let GameState = {
         self.totalVersions = self.phaserJSON.versions.length;
         self.readJSONAndChangeVersion(self.totalVersions);
         // localStorage.clear();
+
+        // For preview
+        self.platforms2 = game.add.group();
 
         // Player
         self.player = new Player(10,10);
@@ -268,6 +272,45 @@ let GameState = {
 
             });
         }
+    },
+
+    previewLevel: function (id) {
+        let self = this;
+
+        // deletes all the ledges from preview
+        self.platforms2.removeAll(true);
+
+        // read json file and draws ledges on screen
+        if (self.phaserJSON === null) {
+
+        } else {
+            self.phaserJSON.versions.forEach(function (item) {
+                // draw preview ledges if the selected node exists
+                // and is not the current version
+                // also not playing
+                if (item.id === id && self.currentVersion !== id && !self.isPlaying) {
+
+                    item.items.forEach(function (i) {
+                        self.platforms2.add(Ledge(self.platforms,i.x,i.y));
+                    });
+                }
+
+            });
+
+            game.world.bringToTop(self.platforms2);
+
+            self.platforms2.forEach(function (item, index) {
+                item.tint = 150 * 0x000000;
+                item.alpha = 0.8;
+            });
+        }
+    },
+
+    previewLevelDisabled: function () {
+        let self = this;
+
+        // deletes all the ledges from preview
+        self.platforms2.removeAll(true);
     }
 
 };

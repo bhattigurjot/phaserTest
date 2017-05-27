@@ -40,7 +40,8 @@ options = {
         }
     },
     interaction:{
-        navigationButtons: true
+        navigationButtons: true,
+        hover: true
     },
     physics: false
 };
@@ -82,6 +83,23 @@ function drawTree(phaserJSON) {
             currNode = params.nodes[0];
         }
         GameState.readJSONAndChangeVersion(currNode);
+    });
+
+    network.on("hoverNode", function (params) {
+
+        // check if the value is null or not
+        if (params) {
+            // call preview function
+            GameState.previewLevel(params.node);
+        }
+
+    });
+
+    network.on("blurNode", function (params) {
+
+        // call disable preview function
+        GameState.previewLevelDisabled();
+
     });
 
     // Context menu - right click

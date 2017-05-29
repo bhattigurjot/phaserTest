@@ -301,8 +301,8 @@ let GameState = {
             game.world.bringToTop(self.platforms2);
 
             self.platforms2.forEach(function (item, index) {
-                item.tint = 150 * 0x000000;
-                item.alpha = 0.8;
+                item.tint = 0x000000;
+                // item.alpha = 0.8;
             });
         }
     },

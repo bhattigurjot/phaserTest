@@ -234,6 +234,7 @@ let GameState = {
 
                     self.phaserJSON.versions.push({
                         "id":(tV + 1),
+                        "label":"Node " + (tV + 1),
                         "parent":self.currentVersion,
                         "items":arr
                     });

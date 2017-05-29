@@ -43,7 +43,24 @@ options = {
         navigationButtons: true,
         hover: true
     },
-    physics: false
+    physics: false,
+    manipulation: {
+        enabled: true,
+        initiallyActive: true,
+        addNode: false,
+        addEdge: false,
+        editEdge: false,
+        editNode: function (data, callback) {
+            // filling in the popup DOM elements
+            document.getElementById('edit-operation').innerHTML = "Edit Node";
+            document.getElementById('edit-label').value = data.label;
+            document.getElementById('edit-save').onclick = saveNodeData.bind(this, data, callback);
+            document.getElementById('edit-cancel').onclick = clearNodePopUp.bind();
+            document.getElementById('edit-popUp').style.display = 'block';
+        },
+        deleteNode: false,
+        deleteEdge: false
+    }
 };
 
 // This draws tree on the screen
@@ -57,7 +74,7 @@ function drawTree(phaserJSON) {
 
     // Add nodes
     phaserJSON.versions.forEach(function (item) {
-        nodes.add({id: item.id, label: 'Node ' + item.id, borderWidth: 1, color: DEFAULT_COLOR, shape: 'box'});
+        nodes.add({id: item.id, label: item.label, borderWidth: 1, color: DEFAULT_COLOR, shape: 'box'});
     });
 
     // Add edges between nodes
@@ -102,15 +119,6 @@ function drawTree(phaserJSON) {
 
     });
 
-    // Context menu - right click
-    // network.on('oncontext', function (params) {
-    //     params.event.preventDefault();
-    //     document.getElementById('popupDialog').style.display = 'block';
-    //     document.getElementById('popupDialog').style.top = params.pointer.canvas.y;
-    //     document.getElementById('popupDialog').style.left = params.pointer.canvas.x;
-    //     console.log("context menu", params);
-    // });
-
     // Set color before drawing the tree
     network.on("beforeDrawing", function (params) {
         if (nodes.length > 0) {
@@ -149,6 +157,18 @@ function changeVersion(val) {
     currNode = val;
 }
 
-// function popupDialogMenu(data) {
-//
-// }
+
+function saveNodeData(data, callback) {
+    // save node label
+    data.label = document.getElementById('edit-label').value;
+    // save new label value in the phaserJSON object
+    GameState.phaserJSON.versions[data.id - 1].label = data.label;
+    clearNodePopUp();
+    callback(data);
+}
+
+function clearNodePopUp() {
+    document.getElementById('edit-save').onclick = null;
+    document.getElementById('edit-cancel').onclick = null;
+    document.getElementById('edit-popUp').style.display = 'none';
+}

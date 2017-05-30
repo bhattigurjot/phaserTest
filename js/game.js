@@ -15,6 +15,8 @@ let GameState = {
     background: null,
     platforms: null,
     platforms2: null,
+    spikes: null,
+    spikes2: null,
     ground: null,
     cursors: null,
     playButton: null,
@@ -31,6 +33,8 @@ let GameState = {
         game.load.image('pause', 'assets/images/pause.png');
         game.load.image('sky', 'assets/images/sky.png');
         game.load.image('ground', 'assets/images/platform.png');
+        game.load.image('groundPreview', 'assets/images/platform2.png');
+        game.load.image('spike', 'assets/images/spikes.png');
         game.load.image('star', 'assets/images/star.png');
         // game.load.json('versions', 'assets/save.json');
         game.load.spritesheet('dude', 'assets/images/dude.png', 32, 48);
@@ -77,6 +81,12 @@ let GameState = {
         self.platforms.enableBody = true;
         self.platforms.inputEnableChildren = true;
 
+        // Spikes group
+        self.spikes = game.add.group();
+        self.spikes.enableBody = true;
+        self.spikes.inputEnableChildren = true;
+        self.spikes.add(Spike(self.spikes, 'spike', 250, 250));
+
         // Ground
         // self.ground = self.platforms.create(0, game.world.height - 64, 'ground');
         self.ground = game.add.sprite(0, game.world.height - 64, 'ground');
@@ -106,6 +116,7 @@ let GameState = {
         if (self.isPlaying) {
             let hitPlatform = game.physics.arcade.collide(self.player, self.platforms);
             let hitGround = game.physics.arcade.collide(self.player, self.ground);
+            let hitSpike = game.physics.arcade.collide(self.player, self.spikes);
 
             // self.player.stop();
             self.player.body.velocity.x = 0;
@@ -134,6 +145,10 @@ let GameState = {
             {
                 self.player.body.velocity.y = -350;
             }
+            if (hitSpike) {
+                self.enablePlaying();
+            }
+
         } else {
             if (game.input.keyboard.isDown(Phaser.Keyboard.CONTROL)) {
                 self.isSavingLevel = true;
@@ -169,13 +184,18 @@ let GameState = {
             self.platforms.forEach(function (item, index) {
                 item.body.immovable = true;
             });
+            // enable physics body on all spikes and make them immovable
+            self.spikes.enableBody = true;
+            self.spikes.forEach(function (item, index) {
+                item.body.immovable = true;
+            });
 
             // Allows player to move and add gravity to player
             self.player.body.moves = true;
             self.player.body.gravity.y = 300;
         } else {
             // Resets scene
-            reset(self.playButton, self.player, self.platforms);
+            reset(self.playButton, self.player, self.platforms, self.spikes);
         }
     },
 
@@ -190,14 +210,14 @@ let GameState = {
         if (pointer.rightButton.isDown && !self.isPlaying) {
             let x = game.input.activePointer.x;
             let y = game.input.activePointer.y;
-            self.platforms.add(Ledge(self.platforms, x, y));
+            self.platforms.add(Ledge(self.platforms, 'ground', x, y));
 
             undoManager.add({
                 undo: function () {
                     self.platforms.getChildAt(self.platforms.length - 1).destroy();
                 },
                 redo: function () {
-                    self.platforms.add(Ledge(self.platforms, x, y));
+                    self.platforms.add(Ledge(self.platforms, 'ground', x, y));
                 }
             });
         }
@@ -276,15 +296,15 @@ let GameState = {
         // read json file and draws ledges on screen
         if (self.phaserJSON === null) {
             self.currentVersion = 1;
-            self.platforms.add(Ledge(self.platforms,100,100));
-            self.platforms.add(Ledge(self.platforms,400,400));
-            self.platforms.add(Ledge(self.platforms,10,250));
+            self.platforms.add(Ledge(self.platforms,'ground',100,100));
+            self.platforms.add(Ledge(self.platforms,'ground',400,400));
+            self.platforms.add(Ledge(self.platforms,'ground',10,250));
         } else {
             self.currentVersion = id;
             self.phaserJSON.versions.forEach(function (item) {
                 if (item.id === self.currentVersion) {
                     item.items.forEach(function (i) {
-                        self.platforms.add(Ledge(self.platforms,i.x,i.y));
+                        self.platforms.add(Ledge(self.platforms,'ground',i.x,i.y));
                     });
                 }
 
@@ -309,7 +329,7 @@ let GameState = {
                 if (item.id === id && self.currentVersion !== id && !self.isPlaying) {
 
                     item.items.forEach(function (i) {
-                        self.platforms2.add(Ledge(self.platforms,i.x,i.y));
+                        self.platforms2.add(Ledge(self.platforms,'groundPreview',i.x,i.y));
                     });
                 }
 
@@ -318,8 +338,8 @@ let GameState = {
             game.world.bringToTop(self.platforms2);
 
             self.platforms2.forEach(function (item, index) {
-                item.tint = 0x000000;
-                // item.alpha = 0.8;
+                // item.tint = 0x000000;
+                item.alpha = 0.6;
             });
         }
     },
@@ -334,7 +354,7 @@ let GameState = {
 };
 
 // This resets the player position and makes ledges movable
-function reset(playButton, player, ledges) {
+function reset(playButton, player, ledges, spikes) {
     // change the playbutton texture to play
     playButton.loadTexture('play');
 
@@ -348,12 +368,17 @@ function reset(playButton, player, ledges) {
         item.immovable = false;
     });
 
+    spikes.forEach(function (item, index) {
+        item.immovable = false;
+    });
+
     switchDragging(true,ledges);
+    switchDragging(true,spikes);
 }
 
 // This toggles the dragging of sprites
-function switchDragging(switchDrag, ledges) {
-    ledges.forEach(function (item, index) {
+function switchDragging(switchDrag, sprites) {
+    sprites.forEach(function (item, index) {
         item.inputEnabled = switchDrag;
     });
 
@@ -370,23 +395,22 @@ function destroySprite(sprite, pointer) {
         let y = sprite.y;
         // get group
         let parentGroup = sprite.parent;
-        // get legde index in array for platforms
+        // get ledge index in array for platforms
         let childIndex = parentGroup.getChildIndex(sprite);
+        // get key for sprite - it identifies the type of sprite
+        let key = sprite.key;
 
         sprite.destroy();
 
         undoManager.add({
             undo: function () {
-                parentGroup.addChildAt(Ledge(parentGroup, x, y), childIndex);
+                parentGroup.addChildAt(Ledge(parentGroup, key, x, y), childIndex);
             },
             redo: function () {
                 parentGroup.getChildAt(childIndex).destroy();
             }
         });
     }
-
-
-
 }
 
 // Player Factory function
@@ -406,8 +430,8 @@ function Player(x, y) {
 }
 
 // Ledge Factory function
-function Ledge(group,x,y) {
-    let ledge = group.create(x, y, 'ground');
+function Ledge(group, type ,x, y) {
+    let ledge = group.create(x, y, type);
     ledge.positions = [];
     ledge.positions.push({
         "x": ledge.x,
@@ -465,4 +489,65 @@ function Ledge(group,x,y) {
     ledge.events.onInputDown.add(destroySprite, this);
 
     return ledge;
+}
+
+// Spike Factory function
+function Spike(group, type ,x, y) {
+    let spike = group.create(x, y, type);
+    spike.positions = [];
+    spike.positions.push({
+        "x": spike.x,
+        "y": spike.y
+    });
+    spike.positionIndex = 0;
+    spike.scale.setTo(0.5,1);
+
+    // Enable dragging and snapping
+    spike.input.enableDrag();
+
+    spike.events.onDragStop.add(function (data) {
+
+        spike.positions.push({
+            "x": spike.x,
+            "y": spike.y
+        });
+
+        spike.positionIndex = spike.positions.length - 1;
+
+        undoManager.add({
+            undo: function () {
+                spike.positionIndex -= 1;
+                console.log("positions",spike.positions);
+                console.log("position index",spike.positionIndex);
+                if (spike.positionIndex >= 0 && spike.positionIndex < spike.positions.length)
+                {
+                    spike.x = spike.positions[spike.positionIndex].x;
+                    spike.y = spike.positions[spike.positionIndex].y;
+                }
+
+            },
+            redo: function () {
+                spike.positionIndex += 1;
+                console.log("positions",spike.positions);
+                console.log("position index",spike.positionIndex);
+                if (spike.positionIndex >= 0 && spike.positionIndex < spike.positions.length)
+                {
+                    spike.x = spike.positions[spike.positionIndex].x;
+                    spike.y = spike.positions[spike.positionIndex].y;
+                }
+            }
+        });
+    });
+
+    spike.resetUndo = function () {
+        spike.positions = spike.positions.splice(1, spike.positions.length);
+        console.log(spike.positions);
+    };
+
+    spike.input.enableSnap(32,32,true,true);
+
+    // bind function to destroy the spike
+    spike.events.onInputDown.add(destroySprite, this);
+
+    return spike;
 }

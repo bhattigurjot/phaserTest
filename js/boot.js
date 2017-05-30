@@ -16,3 +16,18 @@ Client.sendTest();
 // tree.state.add('treeStart', TreeState);
 // tree.state.start('treeStart');
 
+function KeyPress(e) {
+    let obj = window.event? event : e
+    if (obj.keyCode == 90 && obj.ctrlKey){
+        // alert("Ctrl+z");
+        undoManager.undo();
+        console.log("undo",undoManager.getIndex());
+    }
+    if (obj.keyCode == 89 && obj.ctrlKey) {
+        // alert("Ctrl+y");
+        undoManager.redo();
+        console.log("redo",undoManager.getIndex());
+    }
+}
+
+document.onkeydown = KeyPress;

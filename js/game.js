@@ -4,6 +4,8 @@
 
 "use strict";
 
+let undoManager = new UndoManager();
+
 // let obj = localStorage.getItem('all-items');
 // let phaserJSON = null;
 Client.requestDataFromJSON();
@@ -181,8 +183,26 @@ let GameState = {
         let self = this;
 
         // Right click to place ledge on screen
+        // if (pointer.rightButton.isDown && !self.isPlaying) {
+        //     self.platforms.add(Ledge(self.platforms, game.input.activePointer.x, game.input.activePointer.y));
+        // }
+
         if (pointer.rightButton.isDown && !self.isPlaying) {
-            self.platforms.add(Ledge(self.platforms, game.input.activePointer.x, game.input.activePointer.y));
+            console.log('here');
+            let x = game.input.activePointer.x;
+            let y = game.input.activePointer.y;
+            self.platforms.add(Ledge(self.platforms, x, y));
+
+            undoManager.add({
+                undo: function () {
+                    self.platforms.getChildAt(self.platforms.length - 1).destroy();
+                    console.log('undo');
+                },
+                redo: function () {
+                    self.platforms.add(Ledge(self.platforms, x, y));
+                    console.log('redo');
+                }
+            });
         }
     },
 
@@ -368,10 +388,57 @@ function Player(x, y) {
 // Ledge Factory function
 function Ledge(group,x,y) {
     let ledge = group.create(x, y, 'ground');
+    ledge.positions = [];
+    ledge.positions.push({
+        "x": ledge.x,
+        "y": ledge.y
+    });
+    ledge.positionIndex = 0;
     ledge.scale.setTo(0.5,1);
 
     // Enable dragging and snapping
     ledge.input.enableDrag();
+    // ledge.events.onDragStart.add(onSpriteDragStart, this);
+
+    ledge.events.onDragStop.add(function (data) {
+
+        ledge.positions.push({
+            "x": ledge.x,
+            "y": ledge.y
+        });
+
+        ledge.positionIndex = ledge.positions.length - 1;
+
+        undoManager.add({
+            undo: function () {
+                ledge.positionIndex -= 1;
+                console.log("positions",ledge.positions);
+                console.log("position index",ledge.positionIndex);
+                if (ledge.positionIndex && ledge.positionIndex < ledge.positions.length)
+                {
+                    ledge.x = ledge.positions[ledge.positionIndex].x;
+                    ledge.y = ledge.positions[ledge.positionIndex].y;
+                }
+
+            },
+            redo: function () {
+                ledge.positionIndex += 1;
+                console.log("positions",ledge.positions);
+                console.log("position index",ledge.positionIndex);
+                if (ledge.positionIndex && ledge.positionIndex < ledge.positions.length)
+                {
+                    ledge.x = ledge.positions[ledge.positionIndex].x;
+                    ledge.y = ledge.positions[ledge.positionIndex].y;
+                }
+            }
+        });
+    });
+
+    ledge.resetUndo = function () {
+        ledge.positions = ledge.positions.splice(1, ledge.positions.length);
+        console.log(ledge.positions);
+    };
+
     ledge.input.enableSnap(32,32,true,true);
 
     // bind function to destroy the ledge

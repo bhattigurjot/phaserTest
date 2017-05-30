@@ -188,7 +188,6 @@ let GameState = {
         // }
 
         if (pointer.rightButton.isDown && !self.isPlaying) {
-            console.log('here');
             let x = game.input.activePointer.x;
             let y = game.input.activePointer.y;
             self.platforms.add(Ledge(self.platforms, x, y));
@@ -196,11 +195,9 @@ let GameState = {
             undoManager.add({
                 undo: function () {
                     self.platforms.getChildAt(self.platforms.length - 1).destroy();
-                    console.log('undo');
                 },
                 redo: function () {
                     self.platforms.add(Ledge(self.platforms, x, y));
-                    console.log('redo');
                 }
             });
         }
@@ -364,9 +361,32 @@ function switchDragging(switchDrag, ledges) {
 
 // This deletes the ledge sprite on which middle mouse is clicked
 function destroySprite(sprite, pointer) {
+    // if (pointer.middleButton.isDown && !self.isPlaying) {
+    //     sprite.destroy();
+    // }
+
     if (pointer.middleButton.isDown && !self.isPlaying) {
+        let x = sprite.x;
+        let y = sprite.y;
+        // get group
+        let parentGroup = sprite.parent;
+        // get legde index in array for platforms
+        let childIndex = parentGroup.getChildIndex(sprite);
+
         sprite.destroy();
+
+        undoManager.add({
+            undo: function () {
+                parentGroup.addChildAt(Ledge(parentGroup, x, y), childIndex);
+            },
+            redo: function () {
+                parentGroup.getChildAt(childIndex).destroy();
+            }
+        });
     }
+
+
+
 }
 
 // Player Factory function

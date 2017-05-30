@@ -20,6 +20,9 @@ let GameState = {
     ground: null,
     cursors: null,
     playButton: null,
+    ledgeButton: null,
+    spikeButton: null,
+    selectedSpriteToDraw: 'ground',
     isPlaying: false,
     sKey: null,
     phaserJSON: null,
@@ -75,6 +78,23 @@ let GameState = {
         // playButton.scale.setTo(0.25,0.25);
         self.playButton.inputEnabled = true;
         self.playButton.events.onInputUp.add(self.enablePlaying, self);
+
+        // Ledge button
+        self.ledgeButton = game.add.sprite(500, 15,'ground');
+        // self.ledgeButton.scale.setTo(0.1,1);
+        self.ledgeButton.width = 50;
+        self.ledgeButton.inputEnabled = true;
+        self.ledgeButton.events.onInputUp.add(function (data) {
+            self.selectedSpriteToDraw = data.key;
+        }, self);
+        // Spike button
+        self.spikeButton = game.add.sprite(500, 45,'spike', 0);
+        // self.spikeButton.scale.setTo(0.1,1);
+        self.spikeButton.width = 50;
+        self.spikeButton.inputEnabled = true;
+        self.spikeButton.events.onInputUp.add(function (data) {
+            self.selectedSpriteToDraw = data.key;
+        }, self);
 
         // Platforms group
         self.platforms = game.add.group();
@@ -210,14 +230,28 @@ let GameState = {
         if (pointer.rightButton.isDown && !self.isPlaying) {
             let x = game.input.activePointer.x;
             let y = game.input.activePointer.y;
-            self.platforms.add(Ledge(self.platforms, 'ground', x, y));
+            let spriteToDraw = self.selectedSpriteToDraw;
+
+            if (spriteToDraw === 'ground') {
+                self.platforms.add(Ledge(self.platforms, 'ground', x, y));
+            } else {
+                self.spikes.add(Spike(self.spikes, 'spike', x, y));
+            }
 
             undoManager.add({
                 undo: function () {
-                    self.platforms.getChildAt(self.platforms.length - 1).destroy();
+                    if (spriteToDraw === 'ground') {
+                        self.platforms.getChildAt(self.platforms.length - 1).destroy();
+                    } else {
+                        self.spikes.getChildAt(self.spikes.length - 1).destroy();
+                    }
                 },
                 redo: function () {
-                    self.platforms.add(Ledge(self.platforms, 'ground', x, y));
+                    if (spriteToDraw === 'ground') {
+                        self.platforms.add(Ledge(self.platforms, 'ground', x, y));
+                    } else {
+                        self.spikes.add(Spike(self.spikes, 'spike', x, y));
+                    }
                 }
             });
         }
@@ -500,7 +534,7 @@ function Spike(group, type ,x, y) {
         "y": spike.y
     });
     spike.positionIndex = 0;
-    spike.scale.setTo(0.5,1);
+    spike.scale.setTo(0.2,1);
 
     // Enable dragging and snapping
     spike.input.enableDrag();

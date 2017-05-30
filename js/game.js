@@ -414,7 +414,7 @@ function Ledge(group,x,y) {
                 ledge.positionIndex -= 1;
                 console.log("positions",ledge.positions);
                 console.log("position index",ledge.positionIndex);
-                if (ledge.positionIndex && ledge.positionIndex < ledge.positions.length)
+                if (ledge.positionIndex >= 0 && ledge.positionIndex < ledge.positions.length)
                 {
                     ledge.x = ledge.positions[ledge.positionIndex].x;
                     ledge.y = ledge.positions[ledge.positionIndex].y;
@@ -425,7 +425,7 @@ function Ledge(group,x,y) {
                 ledge.positionIndex += 1;
                 console.log("positions",ledge.positions);
                 console.log("position index",ledge.positionIndex);
-                if (ledge.positionIndex && ledge.positionIndex < ledge.positions.length)
+                if (ledge.positionIndex >= 0 && ledge.positionIndex < ledge.positions.length)
                 {
                     ledge.x = ledge.positions[ledge.positionIndex].x;
                     ledge.y = ledge.positions[ledge.positionIndex].y;

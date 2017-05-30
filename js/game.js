@@ -73,28 +73,8 @@ let GameState = {
         self.background.inputEnabled = true;
         self.background.events.onInputDown.add(self.addLedge, self);
 
-        // Play button
-        self.playButton = game.add.sprite(100, 15,'play');
-        // playButton.scale.setTo(0.25,0.25);
-        self.playButton.inputEnabled = true;
-        self.playButton.events.onInputUp.add(self.enablePlaying, self);
-
-        // Ledge button
-        self.ledgeButton = game.add.sprite(500, 15,'ground');
-        // self.ledgeButton.scale.setTo(0.1,1);
-        self.ledgeButton.width = 50;
-        self.ledgeButton.inputEnabled = true;
-        self.ledgeButton.events.onInputUp.add(function (data) {
-            self.selectedSpriteToDraw = data.key;
-        }, self);
-        // Spike button
-        self.spikeButton = game.add.sprite(500, 45,'spike', 0);
-        // self.spikeButton.scale.setTo(0.1,1);
-        self.spikeButton.width = 50;
-        self.spikeButton.inputEnabled = true;
-        self.spikeButton.events.onInputUp.add(function (data) {
-            self.selectedSpriteToDraw = data.key;
-        }, self);
+        // Draw buttons
+        self.drawButtons();
 
         // Platforms group
         self.platforms = game.add.group();
@@ -187,6 +167,29 @@ let GameState = {
     render: function () {
         // Displays FPS on screen
         game.debug.text("FPS:" + game.time.fps, 2, 14, "#000000");
+    },
+
+    drawButtons: function () {
+        let self = this;
+
+        // Play button
+        self.playButton = game.add.sprite(100, 15,'play');
+        self.playButton.inputEnabled = true;
+        self.playButton.events.onInputUp.add(self.enablePlaying, self);
+        // Ledge button
+        self.ledgeButton = game.add.sprite(500, 15,'ground');
+        self.ledgeButton.width = 50;
+        self.ledgeButton.inputEnabled = true;
+        self.ledgeButton.events.onInputUp.add(function (data) {
+            self.selectedSpriteToDraw = data.key;
+        }, self);
+        // Spike button
+        self.spikeButton = game.add.sprite(500, 45,'spike', 0);
+        self.spikeButton.width = 50;
+        self.spikeButton.inputEnabled = true;
+        self.spikeButton.events.onInputUp.add(function (data) {
+            self.selectedSpriteToDraw = data.key;
+        }, self);
     },
     
     enablePlaying: function () {
@@ -472,7 +475,7 @@ function Ledge(group, type ,x, y) {
         "y": ledge.y
     });
     ledge.positionIndex = 0;
-    ledge.scale.setTo(0.5,1);
+    ledge.scale.setTo(0.2,1);
 
     // Enable dragging and snapping
     ledge.input.enableDrag();

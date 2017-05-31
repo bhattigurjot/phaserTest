@@ -128,7 +128,7 @@ function drawTree(phaserJSON) {
         // createSpanElement after 1 second
         // This is done to execute this function after internal
         // vis-manipulation function is complete
-        setTimeout(createSpanElement, 1000);
+        setTimeout(createSpanElement, 500);
 
     });
 
@@ -227,5 +227,7 @@ function createSpanElement(){
 }
 
 function deleteSpanElement() {
-    network.manipulation.manipulationDiv.removeChild(spanElement);
+    if (network.manipulation.manipulationDiv.hasChildNodes()) {
+        network.manipulation.manipulationDiv.removeChild(spanElement);
+    }
 }

@@ -16,9 +16,8 @@ let GameState = {
     gravity: 300,
     background: null,
     platforms: null,
-    platforms2: null,
+    previewGroup: null,
     spikes: null,
-    spikes2: null,
     ground: null,
     cursors: null,
     playButton: null,
@@ -40,6 +39,7 @@ let GameState = {
         game.load.image('ground', 'assets/images/platform.png');
         game.load.image('groundPreview', 'assets/images/platform2.png');
         game.load.image('spike', 'assets/images/spikes.png');
+        game.load.image('spikePreview', 'assets/images/spikes2.png');
         game.load.image('star', 'assets/images/star.png');
         // game.load.json('versions', 'assets/save.json');
         game.load.spritesheet('dude', 'assets/images/dude.png', 32, 48);
@@ -98,7 +98,7 @@ let GameState = {
         self.ground.body.immovable = true;
 
         // For preview
-        self.platforms2 = game.add.group();
+        self.previewGroup = game.add.group();
 
         // Player
         self.player = new Player(10,10);
@@ -375,7 +375,7 @@ let GameState = {
         let self = this;
 
         // deletes all the ledges from preview
-        self.platforms2.removeAll(true);
+        self.previewGroup.removeAll(true);
 
         // read json file and draws ledges on screen
         if (self.phaserJSON === null) {
@@ -387,16 +387,30 @@ let GameState = {
                 // also not playing
                 if (item.id === id && self.currentVersion !== id && !self.isPlaying) {
 
-                    item.items.forEach(function (i) {
-                        self.platforms2.add(Ledge(self.platforms,'groundPreview',i.x,i.y));
-                    });
+                    if ('player' in item.items) {
+                        // self.previewGroup.add(Player(item.items.player.x,item.items.player.y));
+                        // self.player.position.x = item.items.player.x;
+                        // self.player.position.y = item.items.player.y;
+                    }
+                    if ('ledges' in item.items) {
+                        item.items.ledges.forEach(function (i) {
+                            self.previewGroup.add(Ledge(self.platforms,'groundPreview',i.x,i.y));
+                        });
+                    }
+                    if ('spikes' in item.items) {
+                        item.items.spikes.forEach(function (i) {
+                            self.previewGroup.add(Spike(self.spikes,'spikePreview',i.x,i.y));
+                        });
+                    }
+
+
                 }
 
             });
 
-            game.world.bringToTop(self.platforms2);
+            game.world.bringToTop(self.previewGroup);
 
-            self.platforms2.forEach(function (item, index) {
+            self.previewGroup.forEach(function (item, index) {
                 // item.tint = 0x000000;
                 item.alpha = 0.6;
             });
@@ -406,8 +420,8 @@ let GameState = {
     previewLevelDisabled: function () {
         let self = this;
 
-        // deletes all the ledges from preview
-        self.platforms2.removeAll(true);
+        // deletes all the sprites from preview group
+        self.previewGroup.removeAll(true);
     }
 
 };

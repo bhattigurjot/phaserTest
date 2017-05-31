@@ -23,6 +23,7 @@ let GameState = {
     playButton: null,
     ledgeButton: null,
     spikeButton: null,
+    buttonBG: null,
     selectedSpriteToDraw: 'ground',
     isPlaying: false,
     sKey: null,
@@ -174,23 +175,36 @@ let GameState = {
     drawButtons: function () {
         let self = this;
 
+        self.buttonBG = game.add.sprite(615, 15,'ground');
+        self.buttonBG.tint = 0x000000;
+        self.buttonBG.scale.setTo(0.15,1.10);
+        self.buttonBG.alpha = 0.2;
+
         // Play button
         self.playButton = game.add.sprite(100, 15,'play');
         self.playButton.inputEnabled = true;
         self.playButton.events.onInputUp.add(self.enablePlaying, self);
         // Ledge button
-        self.ledgeButton = game.add.sprite(500, 15,'ground');
+        self.ledgeButton = game.add.sprite(620, 15,'ground');
         self.ledgeButton.width = 50;
         self.ledgeButton.inputEnabled = true;
         self.ledgeButton.events.onInputUp.add(function (data) {
             self.selectedSpriteToDraw = data.key;
+
+            // set bg image's position
+            self.buttonBG.position.x = self.ledgeButton.position.x - 5;
+            self.buttonBG.position.y = self.ledgeButton.position.y;
         }, self);
         // Spike button
-        self.spikeButton = game.add.sprite(500, 45,'spike', 0);
+        self.spikeButton = game.add.sprite(620, 45,'spike', 0);
         self.spikeButton.width = 50;
         self.spikeButton.inputEnabled = true;
         self.spikeButton.events.onInputUp.add(function (data) {
             self.selectedSpriteToDraw = data.key;
+
+            // set bg image's position
+            self.buttonBG.position.x = self.spikeButton.position.x - 5;
+            self.buttonBG.position.y = self.spikeButton.position.y;
         }, self);
     },
     
@@ -204,6 +218,9 @@ let GameState = {
             switchDragging(false, self.platforms);
             // Change button texture to pause
             self.playButton.loadTexture('pause');
+            // hide buttons
+            self.ledgeButton.visible = false;
+            self.spikeButton.visible = false;
             // enable physics body on all ledges and make them immovable
             self.platforms.enableBody = true;
             self.platforms.forEach(function (item, index) {
@@ -221,6 +238,9 @@ let GameState = {
         } else {
             // Resets scene
             reset(self.playButton, self.player, self.platforms, self.spikes);
+            // unhide buttons
+            self.ledgeButton.visible = true;
+            self.spikeButton.visible = true;
         }
     },
 

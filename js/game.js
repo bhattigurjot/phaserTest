@@ -97,16 +97,16 @@ let GameState = {
         self.ground.enableBody = true;
         self.ground.body.immovable = true;
 
-        // Ledges - drawn after reading JSON file and according to correct version
-        self.totalVersions = self.phaserJSON.versions.length;
-        self.readJSONAndChangeVersion(self.totalVersions);
-        // localStorage.clear();
-
         // For preview
         self.platforms2 = game.add.group();
 
         // Player
         self.player = new Player(10,10);
+
+        // Ledges and spikes - drawn after reading JSON file and according to correct version
+        self.totalVersions = self.phaserJSON.versions.length;
+        self.readJSONAndChangeVersion(self.totalVersions);
+        // localStorage.clear();
 
         // Draw Tree View
         drawTree(self.phaserJSON);
@@ -265,37 +265,39 @@ let GameState = {
     writeJSON: function () {
         let self = this;
 
-        // let data, text, iter;
-
-        // data = '{"items":[';
-        // self.platforms.forEach(function(item,index) {
-        //     text = '{"x":'+ item.x + ', "y":'+ item.y + '}';
-        //     data += text + ", ";
-        // });
-        // data = data.substring(0, data.length - 2);
-        // data += ']}';
-
-        // localStorage.setItem('all-items', data);
-
-        let arr = [];
+        let ledgeArray = [];
+        let spikeArray = [];
 
         self.platforms.forEach(function(item,index) {
             let temp = {};
             temp.x = item.x;
             temp.y = item.y;
-            arr.push(temp);
+            ledgeArray.push(temp);
         });
+
+        self.spikes.forEach(function(item,index) {
+            let temp = {};
+            temp.x = item.x;
+            temp.y = item.y;
+            spikeArray.push(temp);
+        });
+
+        // To get the player pos object with only x and y values
+        let playerPos = JSON.parse(JSON.stringify(self.player.position));
+        delete playerPos.type;
 
         // Make sure to save only if the current version is different from the previous version
         self.phaserJSON.versions.forEach(function (item) {
             if (item.id === self.currentVersion && !self.isPlaying && self.isSavingLevel) {
 
                 // CHeck if both versions are equal or not
-                if (JSON.stringify(arr) !== JSON.stringify(item.items)) {
-                    let tV = self.phaserJSON.versions.length;
+                if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
+                    JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
+                    JSON.stringify(playerPos) !== JSON.stringify(item.items.player)) {
+                    // let tV = self.phaserJSON.versions.length;
 
-                    // console.log(self.phaserJSON.versions[item.id-1]);
-                    self.phaserJSON.versions[item.id - 1].items = arr;
+                    self.phaserJSON.versions[item.id - 1].items.ledges = ledgeArray;
+                    self.phaserJSON.versions[item.id - 1].items.spikes = spikeArray;
                     //
                     Client.saveToJSON(self.phaserJSON);
 
@@ -304,15 +306,21 @@ let GameState = {
             }
             if (item.id === self.currentVersion && !self.isPlaying && self.isSavingVersion) {
 
-                // CHeck if both versions are equal or not
-                if (JSON.stringify(arr) !== JSON.stringify(item.items)) {
+                // Check if both versions are equal or not
+                if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
+                    JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
+                    JSON.stringify(playerPos) !== JSON.stringify(item.items.player)) {
                     let tV = self.phaserJSON.versions.length;
 
                     self.phaserJSON.versions.push({
                         "id":(tV + 1),
                         "label":"Node " + (tV + 1),
                         "parent":self.currentVersion,
-                        "items":arr
+                        "items":{
+                            "player":playerPos,
+                            "ledges":ledgeArray,
+                            "spikes":spikeArray
+                        }
                     });
 
                     self.currentVersion = tV + 1;
@@ -329,10 +337,11 @@ let GameState = {
     readJSONAndChangeVersion: function (id = 1) {
         let self = this;
 
-        // deletes all the ledges
+        // deletes all the ledges and spikes
         self.platforms.removeAll(true);
+        self.spikes.removeAll(true);
 
-        // read json file and draws ledges on screen
+        // read json file and draws ledges and spikes on screen
         if (self.phaserJSON === null) {
             self.currentVersion = 1;
             self.platforms.add(Ledge(self.platforms,'ground',100,100));
@@ -342,9 +351,20 @@ let GameState = {
             self.currentVersion = id;
             self.phaserJSON.versions.forEach(function (item) {
                 if (item.id === self.currentVersion) {
-                    item.items.forEach(function (i) {
-                        self.platforms.add(Ledge(self.platforms,'ground',i.x,i.y));
-                    });
+                    if ('player' in item.items) {
+                        self.player.position.x = item.items.player.x;
+                        self.player.position.y = item.items.player.y;
+                    }
+                    if ('ledges' in item.items) {
+                        item.items.ledges.forEach(function (i) {
+                            self.platforms.add(Ledge(self.platforms,'ground',i.x,i.y));
+                        });
+                    }
+                    if ('spikes' in item.items) {
+                        item.items.spikes.forEach(function (i) {
+                            self.spikes.add(Spike(self.spikes,'spike',i.x,i.y));
+                        });
+                    }
                 }
 
             });

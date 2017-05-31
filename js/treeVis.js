@@ -61,7 +61,7 @@ options = {
             document.getElementById('edit-label').value = data.label;
             document.getElementById('edit-save').onclick = saveNodeData.bind(this, data, callback);
             document.getElementById('edit-cancel').onclick = clearNodePopUp.bind();
-            document.getElementById('edit-popUp').style.display = 'block';
+            document.getElementById('edit-popUp').style.display = 'inline-block';
         },
         deleteNode: false,
         deleteEdge: false
@@ -97,6 +97,7 @@ function drawTree(phaserJSON) {
     // initialize the tree-network!
     network = new vis.Network(container, data, options);
 
+    spanElement = document.createElement('span');
     createSpanElement();
 
 
@@ -219,7 +220,8 @@ function clearNodePopUp() {
 }
 
 function createSpanElement(){
-    spanElement = document.createElement('span');
+    // spanElement = document.createElement('span');
+    spanElement.innerHTML = "";
     spanElement.innerHTML = "Select Node to edit its label.";
     network.manipulation.manipulationDiv.appendChild(spanElement);
 }

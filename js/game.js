@@ -12,6 +12,8 @@ Client.requestDataFromJSON();
 
 let GameState = {
     player: null,
+    playerVelocity: {x:150, y:320},
+    gravity: 300,
     background: null,
     platforms: null,
     platforms2: null,
@@ -124,13 +126,13 @@ let GameState = {
             if (self.cursors.left.isDown)
             {
                 //  Move to the left
-                self.player.body.velocity.x = -150;
+                self.player.body.velocity.x = -self.playerVelocity.x;
                 self.player.animations.play('left');
             }
             else if (self.cursors.right.isDown)
             {
                 //  Move to the right
-                self.player.body.velocity.x = 150;
+                self.player.body.velocity.x = self.playerVelocity.x;
                 self.player.animations.play('right');
             }
             else
@@ -143,7 +145,7 @@ let GameState = {
             //  Allow the player to jump if they are touching the ground or platform.
             if (self.cursors.up.isDown && self.player.body.touching.down && (hitPlatform || hitGround))
             {
-                self.player.body.velocity.y = -350;
+                self.player.body.velocity.y = -self.playerVelocity.y;
             }
             if (hitSpike) {
                 self.enablePlaying();
@@ -215,7 +217,7 @@ let GameState = {
 
             // Allows player to move and add gravity to player
             self.player.body.moves = true;
-            self.player.body.gravity.y = 300;
+            self.player.body.gravity.y = self.gravity;
         } else {
             // Resets scene
             reset(self.playButton, self.player, self.platforms, self.spikes);

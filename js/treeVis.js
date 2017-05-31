@@ -113,13 +113,7 @@ function drawTree(phaserJSON) {
 
     // Select event to change color
     network.on("selectNode", function (params) {
-
         deleteSpanElement();
-
-        // check if the value is null or not
-        if (params.nodes[0]) {
-            // console.log(params.nodes[0]);
-        }
     });
 
     // Deselect event to change color
@@ -128,7 +122,11 @@ function drawTree(phaserJSON) {
         // createSpanElement after 1 second
         // This is done to execute this function after internal
         // vis-manipulation function is complete
-        setTimeout(createSpanElement, 500);
+        if (network.manipulation.manipulationDiv.hasChildNodes()) {
+            if (network.manipulation.manipulationDiv.children[0].nodeName === "DIV") {
+                setTimeout(createSpanElement, 100);
+            }
+        }
 
     });
 
@@ -220,7 +218,6 @@ function clearNodePopUp() {
 }
 
 function createSpanElement(){
-    // spanElement = document.createElement('span');
     spanElement.innerHTML = "";
     spanElement.innerHTML = "Select Node to edit its label.";
     network.manipulation.manipulationDiv.appendChild(spanElement);
@@ -228,6 +225,14 @@ function createSpanElement(){
 
 function deleteSpanElement() {
     if (network.manipulation.manipulationDiv.hasChildNodes()) {
-        network.manipulation.manipulationDiv.removeChild(spanElement);
+        if (network.manipulation.manipulationDiv.children[0].nodeName === "SPAN") {
+            network.manipulation.manipulationDiv.removeChild(spanElement);
+        } else if (network.manipulation.manipulationDiv.children[0].nodeName === "DIV") {
+            setTimeout(deleteSpanElementInAnotherCase, 100);
+        }
     }
+}
+
+function deleteSpanElementInAnotherCase() {
+    network.manipulation.manipulationDiv.removeChild(spanElement);
 }

@@ -5,6 +5,7 @@
 "use strict";
 
 let undoManager = new UndoManager();
+const SNAP_GRID_SIZE = 16;
 
 // let obj = localStorage.getItem('all-items');
 // let phaserJSON = null;
@@ -235,6 +236,7 @@ let GameState = {
             // Allows player to move and add gravity to player
             self.player.body.moves = true;
             self.player.body.gravity.y = self.gravity;
+            self.player.input.enableDrag(false);
         } else {
             // Resets scene
             reset(self.playButton, self.player, self.platforms, self.spikes);
@@ -456,6 +458,7 @@ function reset(playButton, player, ledges, spikes) {
     player.body.moves = false;
     player.animations.stop();
     player.frame = 4;
+    player.input.enableDrag(true);
 
     ledges.forEach(function (item, index) {
         item.immovable = false;
@@ -510,6 +513,9 @@ function destroySprite(sprite, pointer) {
 function Player(x, y) {
     let player = game.add.sprite(x, y, 'dude');
 
+    // initial pose
+    player.frame = 4;
+
     // Physics and options
     game.physics.arcade.enable(player);
     player.body.bounce.y = 0.2;
@@ -518,6 +524,11 @@ function Player(x, y) {
     // Player's animations
     player.animations.add('left', [0, 1, 2, 3], 10, true);
     player.animations.add('right', [5, 6, 7, 8], 10, true);
+
+    // Enable drag and snap
+    player.inputEnabled = true;
+    player.input.enableDrag(true);
+    player.input.enableSnap(SNAP_GRID_SIZE,SNAP_GRID_SIZE,true,true);
 
     return player;
 }
@@ -576,7 +587,7 @@ function Ledge(group, type ,x, y) {
         console.log(ledge.positions);
     };
 
-    ledge.input.enableSnap(32,32,true,true);
+    ledge.input.enableSnap(SNAP_GRID_SIZE,SNAP_GRID_SIZE,true,true);
 
     // bind function to destroy the ledge
     ledge.events.onInputDown.add(destroySprite, this);
@@ -637,7 +648,7 @@ function Spike(group, type ,x, y) {
         console.log(spike.positions);
     };
 
-    spike.input.enableSnap(32,32,true,true);
+    spike.input.enableSnap(SNAP_GRID_SIZE,SNAP_GRID_SIZE,true,true);
 
     // bind function to destroy the spike
     spike.events.onInputDown.add(destroySprite, this);

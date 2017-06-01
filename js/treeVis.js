@@ -11,7 +11,7 @@ let network = null;
 let currNodeID = null;
 let previewNodeID = null;
 const DEFAULT_COLOR = '#70f36c';
-const CURRENT_VERSION_COLOR = '#1c7ee6';
+const CURRENT_VERSION_COLOR = '#8bc3fb';
 const SELECTED_COLOR = '#f3b7b7';
 const HOVER_PREVIEW_COLOR = '#f3ac4f';
 

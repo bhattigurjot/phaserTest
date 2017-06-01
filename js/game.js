@@ -512,6 +512,12 @@ function destroySprite(sprite, pointer) {
 // Player Factory function
 function Player(x, y) {
     let player = game.add.sprite(x, y, 'dude');
+    player.positions = [];
+    player.positions.push({
+        "x": player.x,
+        "y": player.y
+    });
+    player.positionIndex = 0;
 
     // initial pose
     player.frame = 4;
@@ -529,6 +535,46 @@ function Player(x, y) {
     player.inputEnabled = true;
     player.input.enableDrag(true);
     player.input.enableSnap(SNAP_GRID_SIZE,SNAP_GRID_SIZE,true,true);
+
+    player.events.onDragStop.add(function (data) {
+
+        // Delete rest of positions if the redo changes after undo
+        if (player.positionIndex < player.positions.length - 1) {
+            player.positions.splice(player.positionIndex + 1);
+        }
+
+        player.positions.push({
+            "x": player.x,
+            "y": player.y
+        });
+
+        player.positionIndex = player.positions.length - 1;
+
+        undoManager.add({
+            undo: function () {
+                player.positionIndex -= 1;
+                if (player.positionIndex >= 0 && player.positionIndex < player.positions.length)
+                {
+                    player.x = player.positions[player.positionIndex].x;
+                    player.y = player.positions[player.positionIndex].y;
+                }
+
+            },
+            redo: function () {
+                player.positionIndex += 1;
+                if (player.positionIndex >= 0 && player.positionIndex < player.positions.length)
+                {
+                    player.x = player.positions[player.positionIndex].x;
+                    player.y = player.positions[player.positionIndex].y;
+                }
+            }
+        });
+    });
+
+    player.resetUndo = function () {
+        player.positions = player.positions.splice(1, player.positions.length);
+        console.log(player.positions);
+    };
 
     return player;
 }
@@ -550,6 +596,11 @@ function Ledge(group, type ,x, y) {
 
     ledge.events.onDragStop.add(function (data) {
 
+        // Delete rest of positions if the redo changes after undo
+        if (ledge.positionIndex < ledge.positions.length - 1) {
+            ledge.positions.splice(ledge.positionIndex + 1);
+        }
+
         ledge.positions.push({
             "x": ledge.x,
             "y": ledge.y
@@ -560,8 +611,6 @@ function Ledge(group, type ,x, y) {
         undoManager.add({
             undo: function () {
                 ledge.positionIndex -= 1;
-                console.log("positions",ledge.positions);
-                console.log("position index",ledge.positionIndex);
                 if (ledge.positionIndex >= 0 && ledge.positionIndex < ledge.positions.length)
                 {
                     ledge.x = ledge.positions[ledge.positionIndex].x;
@@ -571,8 +620,6 @@ function Ledge(group, type ,x, y) {
             },
             redo: function () {
                 ledge.positionIndex += 1;
-                console.log("positions",ledge.positions);
-                console.log("position index",ledge.positionIndex);
                 if (ledge.positionIndex >= 0 && ledge.positionIndex < ledge.positions.length)
                 {
                     ledge.x = ledge.positions[ledge.positionIndex].x;
@@ -611,6 +658,11 @@ function Spike(group, type ,x, y) {
 
     spike.events.onDragStop.add(function (data) {
 
+        // Delete rest of positions if the redo changes after undo
+        if (spike.positionIndex < spike.positions.length - 1) {
+            spike.positions.splice(spike.positionIndex + 1);
+        }
+
         spike.positions.push({
             "x": spike.x,
             "y": spike.y
@@ -621,8 +673,6 @@ function Spike(group, type ,x, y) {
         undoManager.add({
             undo: function () {
                 spike.positionIndex -= 1;
-                console.log("positions",spike.positions);
-                console.log("position index",spike.positionIndex);
                 if (spike.positionIndex >= 0 && spike.positionIndex < spike.positions.length)
                 {
                     spike.x = spike.positions[spike.positionIndex].x;
@@ -632,8 +682,6 @@ function Spike(group, type ,x, y) {
             },
             redo: function () {
                 spike.positionIndex += 1;
-                console.log("positions",spike.positions);
-                console.log("position index",spike.positionIndex);
                 if (spike.positionIndex >= 0 && spike.positionIndex < spike.positions.length)
                 {
                     spike.x = spike.positions[spike.positionIndex].x;

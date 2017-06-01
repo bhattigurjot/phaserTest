@@ -328,6 +328,10 @@ let GameState = {
         let playerPos = JSON.parse(JSON.stringify(self.player.position));
         delete playerPos.type;
 
+        // To get the player pos object with only x and y values
+        let firstAidBoxPos = JSON.parse(JSON.stringify(self.firstAidBox.position));
+        delete firstAidBoxPos.type;
+
         // Make sure to save only if the current version is different from the previous version
         self.phaserJSON.versions.forEach(function (item) {
             if (item.id === self.currentVersion && !self.isPlaying && self.isSavingLevel) {
@@ -335,6 +339,7 @@ let GameState = {
                 // CHeck if both versions are equal or not
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
                     JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
+                    JSON.stringify(firstAidBoxPos) !== JSON.stringify(item.items.box) ||
                     JSON.stringify(playerPos) !== JSON.stringify(item.items.player)) {
                     // let tV = self.phaserJSON.versions.length;
 
@@ -351,6 +356,7 @@ let GameState = {
                 // Check if both versions are equal or not
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
                     JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
+                    JSON.stringify(firstAidBoxPos) !== JSON.stringify(item.items.box) ||
                     JSON.stringify(playerPos) !== JSON.stringify(item.items.player)) {
                     let tV = self.phaserJSON.versions.length;
 
@@ -360,6 +366,7 @@ let GameState = {
                         "parent":self.currentVersion,
                         "items":{
                             "player":playerPos,
+                            "box":firstAidBoxPos,
                             "ledges":ledgeArray,
                             "spikes":spikeArray
                         }
@@ -397,6 +404,10 @@ let GameState = {
                         self.player.position.x = item.items.player.x;
                         self.player.position.y = item.items.player.y;
                     }
+                    if ('box' in item.items) {
+                        self.firstAidBox.position.x = item.items.box.x;
+                        self.firstAidBox.position.y = item.items.box.y;
+                    }
                     if ('ledges' in item.items) {
                         item.items.ledges.forEach(function (i) {
                             self.platforms.add(Ledge(self.platforms,'ground',i.x,i.y));
@@ -430,9 +441,18 @@ let GameState = {
                 if (item.id === id && self.currentVersion !== id && !self.isPlaying) {
 
                     if ('player' in item.items) {
-                        // self.previewGroup.add(Player(item.items.player.x,item.items.player.y));
-                        // self.player.position.x = item.items.player.x;
-                        // self.player.position.y = item.items.player.y;
+                        let tempPlayer = Player(item.items.player.x,item.items.player.y);
+                        self.previewGroup.add(tempPlayer);
+                        tempPlayer.position.x = item.items.player.x;
+                        tempPlayer.position.y = item.items.player.y;
+                        tempPlayer.tint = 0x000000;
+                    }
+                    if ('box' in item.items) {
+                        let tempBox = FirstAidBox(item.items.box.x,item.items.box.y);
+                        self.previewGroup.add(tempBox);
+                        tempBox.position.x = item.items.box.x;
+                        tempBox.position.y = item.items.box.y;
+                        tempBox.tint = 0x000000;
                     }
                     if ('ledges' in item.items) {
                         item.items.ledges.forEach(function (i) {
@@ -444,7 +464,6 @@ let GameState = {
                             self.previewGroup.add(Spike(self.spikes,'spikePreview',i.x,i.y));
                         });
                     }
-
 
                 }
 

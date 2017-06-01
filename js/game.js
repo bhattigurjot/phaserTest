@@ -16,6 +16,7 @@ let GameState = {
     playerVelocity: {x:150, y:320},
     gravity: 300,
     background: null,
+    firstAidBox: null,
     platforms: null,
     previewGroup: null,
     spikes: null,
@@ -43,6 +44,7 @@ let GameState = {
         game.load.image('spike', 'assets/images/spikes.png');
         game.load.image('spikePreview', 'assets/images/spikes2.png');
         game.load.image('star', 'assets/images/star.png');
+        game.load.image('box', 'assets/images/firstaid.png');
         // game.load.json('versions', 'assets/save.json');
         game.load.spritesheet('dude', 'assets/images/dude.png', 32, 48);
     },
@@ -104,6 +106,8 @@ let GameState = {
 
         // Player
         self.player = new Player(10,10);
+        // Health box
+        self.firstAidBox = new FirstAidBox(500,500);
 
         // Ledges and spikes - drawn after reading JSON file and according to correct version
         self.totalVersions = self.phaserJSON.versions.length;
@@ -121,6 +125,7 @@ let GameState = {
             let hitPlatform = game.physics.arcade.collide(self.player, self.platforms);
             let hitGround = game.physics.arcade.collide(self.player, self.ground);
             let hitSpike = game.physics.arcade.collide(self.player, self.spikes);
+            game.physics.arcade.overlap(self.player, self.firstAidBox, self.finishGame, null, self);
 
             // self.player.stop();
             self.player.body.velocity.x = 0;
@@ -178,7 +183,7 @@ let GameState = {
 
         self.buttonBG = game.add.sprite(615, 15,'ground');
         self.buttonBG.tint = 0x000000;
-        self.buttonBG.scale.setTo(0.15,1.10);
+        self.buttonBG.scale.setTo(0.15,1);
         self.buttonBG.alpha = 0.2;
 
         // Play button
@@ -188,6 +193,7 @@ let GameState = {
         // Ledge button
         self.ledgeButton = game.add.sprite(620, 15,'ground');
         self.ledgeButton.width = 50;
+        self.ledgeButton.height = 25;
         self.ledgeButton.inputEnabled = true;
         self.ledgeButton.events.onInputUp.add(function (data) {
             self.selectedSpriteToDraw = data.key;
@@ -199,6 +205,7 @@ let GameState = {
         // Spike button
         self.spikeButton = game.add.sprite(620, 45,'spike', 0);
         self.spikeButton.width = 50;
+        self.spikeButton.height = 25;
         self.spikeButton.inputEnabled = true;
         self.spikeButton.events.onInputUp.add(function (data) {
             self.selectedSpriteToDraw = data.key;
@@ -217,11 +224,13 @@ let GameState = {
 
         if (self.isPlaying) {
             switchDragging(false, self.platforms);
+            switchDragging(false, self.spikes);
             // Change button texture to pause
             self.playButton.loadTexture('pause');
             // hide buttons
             self.ledgeButton.visible = false;
             self.spikeButton.visible = false;
+            self.buttonBG.visible = false;
             // enable physics body on all ledges and make them immovable
             self.platforms.enableBody = true;
             self.platforms.forEach(function (item, index) {
@@ -236,13 +245,24 @@ let GameState = {
             // Allows player to move and add gravity to player
             self.player.body.moves = true;
             self.player.body.gravity.y = self.gravity;
-            self.player.input.enableDrag(false);
+
+            // Disable input on player and firstAidBox
+            self.player.inputEnabled = false;
+            self.firstAidBox.inputEnabled = false;
+
+            self.firstAidBox.enableBody = true;
+            self.firstAidBox.body.moves = true;
         } else {
             // Resets scene
             reset(self.playButton, self.player, self.platforms, self.spikes);
             // unhide buttons
             self.ledgeButton.visible = true;
             self.spikeButton.visible = true;
+            self.buttonBG.visible = true;
+
+            // Disable input on player and firstAidBox
+            self.player.inputEnabled = true;
+            self.firstAidBox.inputEnabled = true;
         }
     },
 
@@ -444,9 +464,17 @@ let GameState = {
 
         // deletes all the sprites from preview group
         self.previewGroup.removeAll(true);
+    },
+
+    finishGame: function () {
+        let self = this;
+
+        self.firstAidBox.kill();
+        game.paused = true;
     }
 
 };
+
 
 // This resets the player position and makes ledges movable
 function reset(playButton, player, ledges, spikes) {
@@ -458,7 +486,6 @@ function reset(playButton, player, ledges, spikes) {
     player.body.moves = false;
     player.animations.stop();
     player.frame = 4;
-    player.input.enableDrag(true);
 
     ledges.forEach(function (item, index) {
         item.immovable = false;
@@ -579,6 +606,67 @@ function Player(x, y) {
     return player;
 }
 
+// FirstAidBox Factory function
+function FirstAidBox(x, y) {
+    let firstAidBox = game.add.sprite(x, y, 'box');
+    firstAidBox.positions = [];
+    firstAidBox.positions.push({
+        "x": firstAidBox.x,
+        "y": firstAidBox.y
+    });
+    firstAidBox.positionIndex = 0;
+
+    // Physics and options
+    game.physics.arcade.enable(firstAidBox);
+    firstAidBox.enableBody = true;
+
+    // Enable dragging and snapping
+    firstAidBox.inputEnabled = true;
+    firstAidBox.input.enableDrag(true);
+    firstAidBox.input.enableSnap(SNAP_GRID_SIZE,SNAP_GRID_SIZE,true,true);
+
+    firstAidBox.events.onDragStop.add(function (data) {
+
+        // Delete rest of positions if the redo changes after undo
+        if (firstAidBox.positionIndex < firstAidBox.positions.length - 1) {
+            firstAidBox.positions.splice(firstAidBox.positionIndex + 1);
+        }
+
+        firstAidBox.positions.push({
+            "x": firstAidBox.x,
+            "y": firstAidBox.y
+        });
+
+        firstAidBox.positionIndex = firstAidBox.positions.length - 1;
+
+        undoManager.add({
+            undo: function () {
+                firstAidBox.positionIndex -= 1;
+                if (firstAidBox.positionIndex >= 0 && firstAidBox.positionIndex < firstAidBox.positions.length)
+                {
+                    firstAidBox.x = firstAidBox.positions[firstAidBox.positionIndex].x;
+                    firstAidBox.y = firstAidBox.positions[firstAidBox.positionIndex].y;
+                }
+
+            },
+            redo: function () {
+                firstAidBox.positionIndex += 1;
+                if (firstAidBox.positionIndex >= 0 && firstAidBox.positionIndex < firstAidBox.positions.length)
+                {
+                    firstAidBox.x = firstAidBox.positions[firstAidBox.positionIndex].x;
+                    firstAidBox.y = firstAidBox.positions[firstAidBox.positionIndex].y;
+                }
+            }
+        });
+    });
+
+    firstAidBox.resetUndo = function () {
+        firstAidBox.positions = firstAidBox.positions.splice(1, firstAidBox.positions.length);
+    };
+
+    return firstAidBox;
+}
+
 // Ledge Factory function
 function Ledge(group, type ,x, y) {
     let ledge = group.create(x, y, type);
@@ -591,8 +679,7 @@ function Ledge(group, type ,x, y) {
     ledge.scale.setTo(0.2,1);
 
     // Enable dragging and snapping
-    ledge.input.enableDrag();
-    // ledge.events.onDragStart.add(onSpriteDragStart, this);
+    ledge.input.enableDrag(true);
 
     ledge.events.onDragStop.add(function (data) {
 
@@ -654,7 +741,7 @@ function Spike(group, type ,x, y) {
     spike.scale.setTo(0.2,1);
 
     // Enable dragging and snapping
-    spike.input.enableDrag();
+    spike.input.enableDrag(true);
 
     spike.events.onDragStop.add(function (data) {
 

@@ -19,15 +19,17 @@ Client.sendTest();
 
 function KeyPress(e) {
     let obj = window.event? event : e
-    if (obj.keyCode == 90 && obj.ctrlKey){
-        // alert("Ctrl+z");
+    if (obj.keyCode === 90 && obj.ctrlKey){
         undoManager.undo();
         console.log("undo",undoManager.getIndex());
     }
-    if (obj.keyCode == 89 && obj.ctrlKey) {
-        // alert("Ctrl+y");
+    if (obj.keyCode === 89 && obj.ctrlKey) {
         undoManager.redo();
         console.log("redo",undoManager.getIndex());
+    }
+    if (obj.keyCode === 32 && obj.ctrlKey) {
+        recordActionManager.saveFile();
+        console.log("save file");
     }
 }
 

@@ -1,0 +1,16 @@
+{
+	"actions": [
+		{
+			"action": "add",
+			"type": "ground",
+			"x": 299,
+			"y": 247
+		},
+		{
+			"action": "add",
+			"type": "spike",
+			"x": 196,
+			"y": 315
+		}
+	]
+}

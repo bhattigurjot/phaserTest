@@ -22,7 +22,8 @@ Client.socket.on('jsonData', function (data) {
     Client.dataJSON = data;
 });
 
-Client.saveToJSON = function (data) {
+Client.saveToJSON = function (d, f) {
     console.log("request to save json data");
-    Client.socket.emit('saveJsonData', data);
+    let obj = {data : d, filename: f};
+    Client.socket.emit('saveJsonData', obj);
 };

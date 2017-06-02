@@ -4,6 +4,7 @@
 
 "use strict";
 
+let recordActionManager = new RecordActionsManager();
 let undoManager = new UndoManager();
 const SNAP_GRID_SIZE = 16;
 
@@ -293,6 +294,13 @@ let GameState = {
                 self.spikes.add(Spike(self.spikes, 'spike', x, y));
             }
 
+            recordActionManager.add({
+                "action": "add",
+                "type": spriteToDraw,
+                "x": x,
+                "y": y
+            });
+
             undoManager.add({
                 undo: function () {
                     if (spriteToDraw === 'ground') {
@@ -354,7 +362,7 @@ let GameState = {
                     self.phaserJSON.versions[item.id - 1].items.ledges = ledgeArray;
                     self.phaserJSON.versions[item.id - 1].items.spikes = spikeArray;
                     //
-                    Client.saveToJSON(self.phaserJSON);
+                    Client.saveToJSON(self.phaserJSON, 'save');
 
                     drawTree(self.phaserJSON);
                 }
@@ -382,7 +390,7 @@ let GameState = {
 
                     self.currentVersion = tV + 1;
 
-                    Client.saveToJSON(self.phaserJSON);
+                    Client.saveToJSON(self.phaserJSON, 'save');
                     changeVersion(self.currentVersion);
                     drawTree(self.phaserJSON);
                 }
@@ -545,16 +553,27 @@ function destroySprite(sprite, pointer) {
         let y = sprite.y;
         // get group
         let parentGroup = sprite.parent;
+        console.log(sprite.key);
         // get ledge index in array for platforms
         let childIndex = parentGroup.getChildIndex(sprite);
         // get key for sprite - it identifies the type of sprite
         let key = sprite.key;
 
+        recordActionManager.add({
+            "action": "delete",
+            "type": key,
+            "groupIndex": childIndex,
+        });
         sprite.destroy();
 
         undoManager.add({
             undo: function () {
-                parentGroup.addChildAt(Ledge(parentGroup, key, x, y), childIndex);
+                if (key === "ground") {
+                    parentGroup.addChildAt(Ledge(parentGroup, key, x, y), childIndex);
+                }
+                if (key === "spike") {
+                    parentGroup.addChildAt(Spike(parentGroup, key, x, y), childIndex);
+                }
             },
             redo: function () {
                 parentGroup.getChildAt(childIndex).destroy();

@@ -18,13 +18,19 @@ Client.sendTest();
 // tree.state.start('treeStart');
 
 function KeyPress(e) {
-    let obj = window.event? event : e
+    let obj = window.event? event : e;
     if (obj.keyCode === 90 && obj.ctrlKey){
         undoManager.undo();
+        recordActionManager.add({
+            "action": "undo",
+        });
         console.log("undo",undoManager.getIndex());
     }
     if (obj.keyCode === 89 && obj.ctrlKey) {
         undoManager.redo();
+        recordActionManager.add({
+            "action": "redo",
+        });
         console.log("redo",undoManager.getIndex());
     }
     if (obj.keyCode === 32 && obj.ctrlKey) {

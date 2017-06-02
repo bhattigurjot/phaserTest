@@ -553,7 +553,6 @@ function destroySprite(sprite, pointer) {
         let y = sprite.y;
         // get group
         let parentGroup = sprite.parent;
-        console.log(sprite.key);
         // get ledge index in array for platforms
         let childIndex = parentGroup.getChildIndex(sprite);
         // get key for sprite - it identifies the type of sprite
@@ -621,6 +620,13 @@ function Player(x, y) {
             "y": player.y
         });
 
+        recordActionManager.add({
+            "action": "move",
+            "type": "player",
+            "x": player.x,
+            "y": player.y
+        });
+
         player.positionIndex = player.positions.length - 1;
 
         undoManager.add({
@@ -683,6 +689,13 @@ function FirstAidBox(x, y) {
             "y": firstAidBox.y
         });
 
+        recordActionManager.add({
+            "action": "move",
+            "type": "firstAidBox",
+            "x": firstAidBox.x,
+            "y": firstAidBox.y
+        });
+
         firstAidBox.positionIndex = firstAidBox.positions.length - 1;
 
         undoManager.add({
@@ -735,6 +748,14 @@ function Ledge(group, type ,x, y) {
         }
 
         ledge.positions.push({
+            "x": ledge.x,
+            "y": ledge.y
+        });
+
+        recordActionManager.add({
+            "action": "move",
+            "type": ledge.key,
+            "groupIndex": ledge.parent.getChildIndex(ledge),
             "x": ledge.x,
             "y": ledge.y
         });
@@ -797,6 +818,14 @@ function Spike(group, type ,x, y) {
         }
 
         spike.positions.push({
+            "x": spike.x,
+            "y": spike.y
+        });
+
+        recordActionManager.add({
+            "action": "move",
+            "type": spike.key,
+            "groupIndex": spike.parent.getChildIndex(spike),
             "x": spike.x,
             "y": spike.y
         });

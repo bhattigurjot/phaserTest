@@ -34,8 +34,7 @@ let GameState = {
     phaserJSON: null,
     totalVersions: null,
     currentVersion: null,
-    isSavingLevel: false,
-    isSavingVersion: false,
+    debugMode: true,
 
     preload: function () {
         game.load.image('play', 'assets/images/play.png');
@@ -58,6 +57,8 @@ let GameState = {
         // Enable advanced timing to display FPS
         game.time.advancedTiming = true;
 
+        game.stage.disableVisibilityChange = true;
+
         // Read into json object
         // phaserJSON = game.cache.getJSON('versions');
         self.phaserJSON = Client.dataJSON;
@@ -65,9 +66,6 @@ let GameState = {
         // Input
         self.cursors = game.input.keyboard.createCursorKeys();
         game.input.mouse.capture = true;
-
-        self.sKey = game.input.keyboard.addKey(Phaser.Keyboard.S);
-        self.sKey.onDown.add(self.writeJSON, self);
 
         // Disable right click context menu
         game.canvas.oncontextmenu = function (e) {
@@ -125,6 +123,8 @@ let GameState = {
         let self = this;
 
         if (self.isPlaying) {
+            self.debugMode = false;
+
             let hitPlatform = game.physics.arcade.collide(self.player, self.platforms);
             let hitGround = game.physics.arcade.collide(self.player, self.ground);
             let hitSpike = game.physics.arcade.collide(self.player, self.spikes);
@@ -162,23 +162,22 @@ let GameState = {
             }
 
         } else {
-            if (game.input.keyboard.isDown(Phaser.Keyboard.CONTROL)) {
-                self.isSavingLevel = true;
-            } else if (game.input.keyboard.isDown(Phaser.Keyboard.ALT)) {
-                self.isSavingVersion = true;
-            } else {
-                self.isSavingLevel = false;
-                self.isSavingVersion = false;
-            }
+            self.debugMode = true;
         }
 
-        // Display current version on screen
-        game.debug.text("Current Version:" + self.currentVersion, 72, 14, "#ffffff");
     },
 
     render: function () {
-        // Displays FPS on screen
-        game.debug.text("FPS:" + game.time.fps, 2, 14, "#ffffff");
+        let self = this;
+
+        if (self.debugMode) {
+            // Displays FPS on screen
+            game.debug.text("FPS:" + game.time.fps, 2, 14, "#ffffff");
+            // Display current version on screen
+            game.debug.text("Current Version:" + self.currentVersion, 72, 14, "#ffffff");
+        } else {
+            game.debug.reset();
+        }
     },
 
     drawToolbar: function () {
@@ -195,7 +194,7 @@ let GameState = {
         self.buttonHighlight.alpha = 0.35;
 
         // Play button
-        self.playButton = game.add.sprite(100, 15,'play');
+        self.playButton = game.add.sprite(560, 15,'play');
         self.playButton.inputEnabled = true;
         self.playButton.events.onInputUp.add(self.enablePlaying, self);
         // Ledge button
@@ -320,7 +319,7 @@ let GameState = {
         }
     },
 
-    writeJSON: function () {
+    writeJSON: function (saveAction) {
         let self = this;
 
         let ledgeArray = [];
@@ -350,7 +349,7 @@ let GameState = {
 
         // Make sure to save only if the current version is different from the previous version
         self.phaserJSON.versions.forEach(function (item) {
-            if (item.id === self.currentVersion && !self.isPlaying && self.isSavingLevel) {
+            if (item.id === self.currentVersion && !self.isPlaying && saveAction === 'saveFile') {
 
                 // CHeck if both versions are equal or not
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
@@ -367,7 +366,7 @@ let GameState = {
                     drawTree(self.phaserJSON);
                 }
             }
-            if (item.id === self.currentVersion && !self.isPlaying && self.isSavingVersion) {
+            if (item.id === self.currentVersion && !self.isPlaying && saveAction === 'saveVersion') {
 
                 // Check if both versions are equal or not
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||

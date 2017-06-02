@@ -25,7 +25,8 @@ let GameState = {
     playButton: null,
     ledgeButton: null,
     spikeButton: null,
-    buttonBG: null,
+    toolbar: null,
+    buttonHighlight: null,
     selectedSpriteToDraw: 'ground',
     isPlaying: false,
     sKey: null,
@@ -43,6 +44,7 @@ let GameState = {
         game.load.image('groundPreview', 'assets/images/platform2.png');
         game.load.image('spike', 'assets/images/spikes.png');
         game.load.image('spikePreview', 'assets/images/spikes2.png');
+        game.load.image('toolbar', 'assets/images/toolbar.png');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('box', 'assets/images/firstaid.png');
         // game.load.json('versions', 'assets/save.json');
@@ -80,7 +82,7 @@ let GameState = {
         self.background.events.onInputDown.add(self.addLedge, self);
 
         // Draw buttons
-        self.drawButtons();
+        self.drawToolbar();
 
         // Platforms group
         self.platforms = game.add.group();
@@ -170,21 +172,26 @@ let GameState = {
         }
 
         // Display current version on screen
-        game.debug.text("Current Version:" + self.currentVersion, 72, 14, "#000000");
+        game.debug.text("Current Version:" + self.currentVersion, 72, 14, "#ffffff");
     },
 
     render: function () {
         // Displays FPS on screen
-        game.debug.text("FPS:" + game.time.fps, 2, 14, "#000000");
+        game.debug.text("FPS:" + game.time.fps, 2, 14, "#ffffff");
     },
 
-    drawButtons: function () {
+    drawToolbar: function () {
         let self = this;
 
-        self.buttonBG = game.add.sprite(615, 15,'ground');
-        self.buttonBG.tint = 0x000000;
-        self.buttonBG.scale.setTo(0.15,1);
-        self.buttonBG.alpha = 0.2;
+        self.toolbar = game.add.group();
+
+        let bg = game.add.sprite(605, 10,'toolbar');
+        bg.scale.setTo(0.2,2);
+
+        self.buttonHighlight = game.add.sprite(615, 15,'ground');
+        self.buttonHighlight.tint = 0x000000;
+        self.buttonHighlight.scale.setTo(0.15,1);
+        self.buttonHighlight.alpha = 0.35;
 
         // Play button
         self.playButton = game.add.sprite(100, 15,'play');
@@ -199,8 +206,8 @@ let GameState = {
             self.selectedSpriteToDraw = data.key;
 
             // set bg image's position
-            self.buttonBG.position.x = self.ledgeButton.position.x - 5;
-            self.buttonBG.position.y = self.ledgeButton.position.y;
+            self.buttonHighlight.position.x = self.ledgeButton.position.x - 5;
+            self.buttonHighlight.position.y = self.ledgeButton.position.y;
         }, self);
         // Spike button
         self.spikeButton = game.add.sprite(620, 45,'spike', 0);
@@ -211,9 +218,14 @@ let GameState = {
             self.selectedSpriteToDraw = data.key;
 
             // set bg image's position
-            self.buttonBG.position.x = self.spikeButton.position.x - 5;
-            self.buttonBG.position.y = self.spikeButton.position.y;
+            self.buttonHighlight.position.x = self.spikeButton.position.x - 5;
+            self.buttonHighlight.position.y = self.spikeButton.position.y;
         }, self);
+
+        self.toolbar.add(bg);
+        self.toolbar.add(self.buttonHighlight);
+        self.toolbar.add(self.ledgeButton);
+        self.toolbar.add(self.spikeButton);
     },
     
     enablePlaying: function () {
@@ -227,10 +239,8 @@ let GameState = {
             switchDragging(false, self.spikes);
             // Change button texture to pause
             self.playButton.loadTexture('pause');
-            // hide buttons
-            self.ledgeButton.visible = false;
-            self.spikeButton.visible = false;
-            self.buttonBG.visible = false;
+            // hide toolbar
+            self.toolbar.visible = false;
             // enable physics body on all ledges and make them immovable
             self.platforms.enableBody = true;
             self.platforms.forEach(function (item, index) {
@@ -255,10 +265,8 @@ let GameState = {
         } else {
             // Resets scene
             reset(self.playButton, self.player, self.platforms, self.spikes);
-            // unhide buttons
-            self.ledgeButton.visible = true;
-            self.spikeButton.visible = true;
-            self.buttonBG.visible = true;
+            // un-hide toolbar
+            self.toolbar.visible = true;
 
             // Disable input on player and firstAidBox
             self.player.inputEnabled = true;

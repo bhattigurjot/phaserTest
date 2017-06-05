@@ -47,7 +47,7 @@ function KeyPress(e) {
         GameState.writeJSON('saveFile');
         console.log("save file");
     }
-    if (obj.keyCode === 83 && obj.altKey) {
+    if (obj.keyCode === 83 && obj.ctrlKey && obj.shiftKey) {
         obj.preventDefault();
         GameState.writeJSON('saveVersion');
         console.log("save version");

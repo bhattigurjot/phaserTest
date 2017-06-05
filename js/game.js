@@ -235,6 +235,12 @@ let GameState = {
         self.isPlaying = !self.isPlaying;
 
         if (self.isPlaying) {
+
+            // save version on every play testing
+            self.isPlaying = false;
+            self.writeJSON('saveVersion');
+            self.isPlaying = true;
+
             switchDragging(false, self.platforms);
             switchDragging(false, self.spikes);
             // Change button texture to pause

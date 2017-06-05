@@ -24,6 +24,7 @@ function KeyPress(e) {
         undoManager.undo();
         recordActionManager.add({
             "action": "undo",
+            "timestamp": (new Date).toISOString(),
         });
         console.log("undo",undoManager.getIndex());
     }
@@ -32,6 +33,7 @@ function KeyPress(e) {
         undoManager.redo();
         recordActionManager.add({
             "action": "redo",
+            "timestamp": (new Date).toISOString(),
         });
         console.log("redo",undoManager.getIndex());
     }
@@ -47,7 +49,7 @@ function KeyPress(e) {
     }
     if (obj.keyCode === 83 && obj.altKey) {
         obj.preventDefault();
-        GameState.writeJSON('saveVersions');
+        GameState.writeJSON('saveVersion');
         console.log("save version");
     }
 }

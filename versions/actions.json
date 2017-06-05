@@ -1,16 +1,29 @@
 {
 	"actions": [
 		{
-			"action": "add",
+			"action": "move",
+			"timestamp": "2017-06-05T18:34:35.622Z",
 			"type": "ground",
-			"x": 299,
-			"y": 247
+			"groupIndex": 0,
+			"x": 272,
+			"y": 80
 		},
 		{
 			"action": "add",
+			"timestamp": "2017-06-05T18:34:36.609Z",
+			"type": "ground",
+			"x": 479,
+			"y": 142
+		},
+		{
+			"action": "delete",
+			"timestamp": "2017-06-05T18:34:37.945Z",
 			"type": "spike",
-			"x": 196,
-			"y": 315
+			"groupIndex": 2
+		},
+		{
+			"action": "undo",
+			"timestamp": "2017-06-05T18:34:40.779Z"
 		}
 	]
 }

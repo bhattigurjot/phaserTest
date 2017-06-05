@@ -295,6 +295,7 @@ let GameState = {
 
             recordActionManager.add({
                 "action": "add",
+                "timestamp": (new Date).toISOString(),
                 "type": spriteToDraw,
                 "x": x,
                 "y": y
@@ -559,6 +560,7 @@ function destroySprite(sprite, pointer) {
 
         recordActionManager.add({
             "action": "delete",
+            "timestamp": (new Date).toISOString(),
             "type": key,
             "groupIndex": childIndex,
         });
@@ -621,6 +623,7 @@ function Player(x, y) {
 
         recordActionManager.add({
             "action": "move",
+            "timestamp": (new Date).toISOString(),
             "type": "player",
             "x": player.x,
             "y": player.y
@@ -690,6 +693,7 @@ function FirstAidBox(x, y) {
 
         recordActionManager.add({
             "action": "move",
+            "timestamp": (new Date).toISOString(),
             "type": "firstAidBox",
             "x": firstAidBox.x,
             "y": firstAidBox.y
@@ -753,6 +757,7 @@ function Ledge(group, type ,x, y) {
 
         recordActionManager.add({
             "action": "move",
+            "timestamp": (new Date).toISOString(),
             "type": ledge.key,
             "groupIndex": ledge.parent.getChildIndex(ledge),
             "x": ledge.x,
@@ -823,6 +828,7 @@ function Spike(group, type ,x, y) {
 
         recordActionManager.add({
             "action": "move",
+            "timestamp": (new Date).toISOString(),
             "type": spike.key,
             "groupIndex": spike.parent.getChildIndex(spike),
             "x": spike.x,

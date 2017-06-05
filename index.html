@@ -45,6 +45,31 @@
             background-color: #f9f9f9;
             margin: 0 auto;
         }
+        #treeDiv-legend {
+            z-index:15;
+            display: block;
+            position: relative;
+            width: 225px;
+            top: -580px;
+            left: 1%;
+            background-color: #f9f9f9;
+            margin: 0 auto;
+        }
+        #treeDiv-legend:hover {
+            display: none;
+        }
+        ul {
+            list-style-type: square;
+        }
+        #li-sn{
+            color: #f3b7b7;
+        }
+        #li-cwn{
+            color: #8bc3fb;
+        }
+        #li-on{
+            color: #70f36c;
+        }
     </style>
 
 </head>
@@ -64,6 +89,13 @@
                 </table>
                 <input type="button" value="Save" id="edit-save"/>
                 <input type="button" value="Cancel" id="edit-cancel"/>
+            </div>
+            <div id="treeDiv-legend">
+                <ul>
+                    <li id="li-sn"><span>Selected Node</span></li>
+                    <li id="li-cwn"><span>Current Working Node</span></li>
+                    <li id="li-on"><span>Other Nodes</span></li>
+                </ul>
             </div>
         </div>
 

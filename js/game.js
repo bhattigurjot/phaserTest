@@ -237,9 +237,14 @@ let GameState = {
         if (self.isPlaying) {
 
             // save version on every play testing
-            self.isPlaying = false;
-            self.writeJSON('saveVersion');
-            self.isPlaying = true;
+            // self.isPlaying = false;
+            // self.writeJSON('saveVersion');
+            // self.isPlaying = true;
+
+            recordActionManager.add({
+                "action": "play",
+                "timestamp": (new Date).toISOString()
+            });
 
             switchDragging(false, self.platforms);
             switchDragging(false, self.spikes);
@@ -371,6 +376,11 @@ let GameState = {
                     Client.saveToJSON(self.phaserJSON, 'save');
 
                     drawTree(self.phaserJSON);
+
+                    recordActionManager.add({
+                        "action": "saveFile",
+                        "timestamp": (new Date).toISOString(),
+                    });
                 }
             }
             if (item.id === self.currentVersion && !self.isPlaying && saveAction === 'saveVersion') {
@@ -399,6 +409,11 @@ let GameState = {
                     Client.saveToJSON(self.phaserJSON, 'save');
                     changeVersion(self.currentVersion);
                     drawTree(self.phaserJSON);
+
+                    recordActionManager.add({
+                        "action": "saveVersion",
+                        "timestamp": (new Date).toISOString(),
+                    });
                 }
             }
         });

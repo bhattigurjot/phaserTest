@@ -3,83 +3,21 @@
  */
 "use strict";
 
-let RecordActionsParser = function() {
-    let recordJSON = {
-        "actions": [
-            {
-                "action": "move",
-                "timestamp": "2017-06-05T18:34:35.622Z",
-                "type": "ground",
-                "groupIndex": 0,
-                "x": 272,
-                "y": 80
-            },
-            {
-                "action": "add",
-                "timestamp": "2017-06-05T18:34:36.609Z",
-                "type": "ground",
-                "x": 479,
-                "y": 142
-            },
-            {
-                "action": "delete",
-                "timestamp": "2017-06-05T18:34:37.945Z",
-                "type": "spike",
-                "groupIndex": 2
-            },
-            {
-                "action": "undo",
-                "timestamp": "2017-06-05T18:34:40.779Z"
-            }
-        ]
-    };
-    let STATE = 'Play';
+function RecordActionsParser() {
+    let self = this;
 
-    read = function (STATE) {
+    this.recordJSON = {};
+    this.STATE = 'Play';
 
-        switch (STATE) {
-            case 'Time':
-                recordJSON.actions.forEach(function (item) {
-
-                });
-                break;
-            case 'Play':
-                recordJSON.actions.forEach(function (item) {
-                    if (item.action === 'add') {
-                        addFxn(item);
-                    }
-                    if (item.action === 'delete') {
-                        deleteFxn(item);
-                    }
-                    if (item.action === 'move') {
-                        moveFxn(item);
-                    }
-                    if (item.action = "play") {
-                        saveVersionFxn();
-                    }
-                    if (item.action = "undo") {
-                        undoFxn();
-                    }
-                    if (item.action = "redo") {
-                        redoFxn();
-                    }
-                });
-                break;
-            default:
-                console.log('Sorry, ' + STATE + ' state not found.');
-        }
-
-    };
-    
-    addFxn = function (item) {
+    this.addFxn = function (item) {
         if (item.type === 'ground') {
             GameState.platforms.add(Ledge(GameState.platforms, 'ground', item.x, item.y));
         } else {
             GameState.spikes.add(Spike(GameState.spikes, 'spike', item.x, item.y));
         }
     };
-    
-    deleteFxn = function (item) {
+
+    this.deleteFxn = function (item) {
         if (item.type === 'ground') {
             GameState.platforms.getChildAt(item.groupIndex).destroy();
         } else {
@@ -87,7 +25,7 @@ let RecordActionsParser = function() {
         }
     };
 
-    moveFxn = function (item) {
+    this.moveFxn = function (item) {
         if (item.type === 'player') {
             GameState.player.x = item.x;
             GameState.player.y = item.y;
@@ -103,20 +41,85 @@ let RecordActionsParser = function() {
         }
     };
 
-    undoFxn = function () {
+    this.undoFxn = function () {
         document.dispatchEvent(new KeyboardEvent('keydown',{'keyCode':'90', 'ctrlKey':true}));
     };
 
-    redoFxn = function () {
+    this.redoFxn = function () {
         document.dispatchEvent(new KeyboardEvent('keydown',{'keyCode':'89', 'ctrlKey':true}));
     };
 
-    saveFileFxn = function () {
+    this.saveFileFxn = function () {
         GameState.writeJSON('saveFile');
     };
 
-    saveVersionFxn = function () {
+    this.saveVersionFxn = function () {
         GameState.writeJSON('saveVersion');
     };
+
+    this.read = function (STATE) {
+
+        switch (STATE) {
+            case 'Time':
+                this.recordJSON.actions.forEach(function (item) {
+
+                });
+                break;
+            case 'Play':
+                this.recordJSON.actions.forEach(function (item) {
+                    if (item.action === 'add') {
+                        self.addFxn(item);
+                    }
+                    if (item.action === 'delete') {
+                        self.deleteFxn(item);
+                    }
+                    if (item.action === 'move') {
+                        self.moveFxn(item);
+                    }
+                    if (item.action === "play") {
+                        self.saveVersionFxn();
+                    }
+                    if (item.action === "undo") {
+                        self.undoFxn();
+                    }
+                    if (item.action === "redo") {
+                        self.redoFxn();
+                    }
+                });
+                break;
+            default:
+                console.log('Sorry, ' + STATE + ' state not found.');
+        }
+
+    };
+
+};
+
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+function handleFileSelect(evt) {
+    let recordParser = new RecordActionsParser();
+    let files = evt.target.files; // FileList object
+    let f = files[0];
+    let reader = new FileReader();
+    // Closure to capture the file information.
+    reader.onload = (function(theFile) {
+        return function(e) {
+            // Render thumbnail.
+            recordParser.recordJSON = JSON.parse(e.target.result);
+            console.log(recordParser.recordJSON);
+            recordParser.read('Play');
+
+            window.open(
+                "/allTrees.html",
+                "DescriptiveWindowName",
+                "resizable,scrollbars,status"
+            );
+        };
+    })(f);
+
+    // Read in the image file as a data URL.
+    reader.readAsText(f);
+
 
 };

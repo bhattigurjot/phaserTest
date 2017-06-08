@@ -10,7 +10,7 @@ const SNAP_GRID_SIZE = 16;
 
 // let obj = localStorage.getItem('all-items');
 // let phaserJSON = null;
-Client.requestDataFromJSON();
+Client.requestDataFromJSON('save');
 
 let GameState = {
     player: null,
@@ -35,6 +35,7 @@ let GameState = {
     totalVersions: null,
     currentVersion: null,
     debugMode: true,
+    FILENAME: 'save',
 
     preload: function () {
         game.load.image('play', 'assets/images/play.png');
@@ -47,7 +48,6 @@ let GameState = {
         game.load.image('toolbar', 'assets/images/toolbar.png');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('box', 'assets/images/firstaid.png');
-        // game.load.json('versions', 'assets/save.json');
         game.load.spritesheet('dude', 'assets/images/dude.png', 32, 48);
     },
 
@@ -58,10 +58,6 @@ let GameState = {
         game.time.advancedTiming = true;
 
         game.stage.disableVisibilityChange = true;
-
-        // Read into json object
-        // phaserJSON = game.cache.getJSON('versions');
-        self.phaserJSON = Client.dataJSON;
 
         // Input
         self.cursors = game.input.keyboard.createCursorKeys();
@@ -110,13 +106,19 @@ let GameState = {
         // Health box
         self.firstAidBox = new FirstAidBox(500,500);
 
-        // Ledges and spikes - drawn after reading JSON file and according to correct version
-        self.totalVersions = self.phaserJSON.versions.length;
-        self.readJSONAndChangeVersion(self.totalVersions);
-        // localStorage.clear();
 
-        // Draw Tree View
-        drawTree(self.phaserJSON);
+        setTimeout(function () {
+            // Read into json object
+            self.phaserJSON = Client.dataJSON;
+
+            // Ledges and spikes - drawn after reading JSON file and according to correct version
+            self.totalVersions = self.phaserJSON.versions.length;
+            self.readJSONAndChangeVersion(self.totalVersions);
+
+            // Draw Tree View
+            drawTree(self.phaserJSON);
+        }, 500);
+
     },
 
     update: function () {
@@ -180,6 +182,10 @@ let GameState = {
         }
     },
 
+    shutdown: function() {
+        game.world.removeAll();
+    },
+
     drawToolbar: function () {
         let self = this;
 
@@ -235,12 +241,6 @@ let GameState = {
         self.isPlaying = !self.isPlaying;
 
         if (self.isPlaying) {
-
-            // save version on every play testing
-            // self.isPlaying = false;
-            // self.writeJSON('saveVersion');
-            // self.isPlaying = true;
-
             recordActionManager.add({
                 "action": "play",
                 "timestamp": (new Date).toISOString()
@@ -287,11 +287,6 @@ let GameState = {
 
     addLedge: function (background, pointer) {
         let self = this;
-
-        // Right click to place ledge on screen
-        // if (pointer.rightButton.isDown && !self.isPlaying) {
-        //     self.platforms.add(Ledge(self.platforms, game.input.activePointer.x, game.input.activePointer.y));
-        // }
 
         if (pointer.rightButton.isDown && !self.isPlaying) {
             let x = game.input.activePointer.x;
@@ -373,7 +368,7 @@ let GameState = {
                     self.phaserJSON.versions[item.id - 1].items.ledges = ledgeArray;
                     self.phaserJSON.versions[item.id - 1].items.spikes = spikeArray;
                     //
-                    Client.saveToJSON(self.phaserJSON, 'save');
+                    Client.saveToJSON(self.phaserJSON, self.FILENAME);
 
                     drawTree(self.phaserJSON);
 
@@ -406,7 +401,7 @@ let GameState = {
 
                     self.currentVersion = tV + 1;
 
-                    Client.saveToJSON(self.phaserJSON, 'save');
+                    Client.saveToJSON(self.phaserJSON, self.FILENAME);
                     changeVersion(self.currentVersion);
                     drawTree(self.phaserJSON);
 
@@ -527,6 +522,13 @@ let GameState = {
 
         self.firstAidBox.kill();
         game.paused = true;
+    },
+
+    restartLevel: function () {
+        let self = this;
+
+        game.state.restart();
+        undoManager.clear();
     }
 
 };

@@ -37,7 +37,6 @@ let Tree = function(val, id) {
         edges: {
             smooth: {
                 type: 'cubicBezier',
-                // forceDirection: 'horizontal',
                 roundness: 0.4
             }
         },
@@ -130,7 +129,7 @@ let Tree = function(val, id) {
 
 };
 
-let t1 = new Tree(JSON.parse(localStorage.getItem('val')), 'treeDiv-1');
+let t1 = new Tree(JSON.parse(localStorage.getItem('v-play')), 'treeDiv-1');
 t1.drawTree();
-let t2 = new Tree(JSON.parse(localStorage.getItem('val')), 'treeDiv-2');
+let t2 = new Tree(JSON.parse(localStorage.getItem('v-every-change')), 'treeDiv-2');
 t2.drawTree();

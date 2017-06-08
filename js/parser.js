@@ -7,7 +7,7 @@ function RecordActionsParser() {
     let self = this;
 
     this.recordJSON = {};
-    this.STATE = 'Play';
+    // this.STATE = 'Play';
 
     this.addFxn = function (item) {
         if (item.type === 'ground') {
@@ -87,6 +87,28 @@ function RecordActionsParser() {
                     }
                 });
                 break;
+            case 'Every-Change':
+                this.recordJSON.actions.forEach(function (item) {
+                    if (item.action === 'add') {
+                        self.addFxn(item);
+                        self.saveVersionFxn();
+                    }
+                    if (item.action === 'delete') {
+                        self.deleteFxn(item);
+                        self.saveVersionFxn();
+                    }
+                    if (item.action === 'move') {
+                        self.moveFxn(item);
+                        self.saveVersionFxn();
+                    }
+                    if (item.action === "undo") {
+                        self.undoFxn();
+                    }
+                    if (item.action === "redo") {
+                        self.redoFxn();
+                    }
+                });
+                break;
             default:
                 console.log('Sorry, ' + STATE + ' state not found.');
         }
@@ -107,10 +129,24 @@ function handleFileSelect(evt) {
         return function(e) {
             // Render thumbnail.
             recordParser.recordJSON = JSON.parse(e.target.result);
-            console.log(recordParser.recordJSON);
-            // recordParser.read('Play');
+            recordParser.read('Play');
+            GameState.FILENAME = 'play';
+            Client.requestDataFromJSON('play');
+            localStorage.setItem('v-play', JSON.stringify(Client.dataJSON));
+            GameState.restartLevel();
 
-            localStorage.setItem('val', JSON.stringify(recordParser.recordJSON));
+            console.log(Client.dataJSON);
+
+            recordParser.read('Every-Change');
+            GameState.FILENAME = 'everyChange';
+            Client.requestDataFromJSON('everyChange');
+            localStorage.setItem('v-every-change', JSON.stringify(Client.dataJSON));
+            GameState.restartLevel();
+
+            console.log(Client.dataJSON);
+
+            alert("yo");
+
             window.location = '/allTrees.html';
 
             // window.open(

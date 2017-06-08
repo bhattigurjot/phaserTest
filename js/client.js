@@ -7,14 +7,9 @@ let Client = {};
 Client.socket = io.connect();
 Client.dataJSON = null;
 
-Client.sendTest = function () {
-    console.log("test sent");
-    Client.socket.emit('test');
-};
-
-Client.requestDataFromJSON = function () {
+Client.requestDataFromJSON = function (fileName) {
     console.log("request for json data");
-    Client.socket.emit('getJsonData');
+    Client.socket.emit('getJsonData', fileName);
 };
 
 Client.socket.on('jsonData', function (data) {

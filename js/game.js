@@ -12,6 +12,8 @@ const SNAP_GRID_SIZE = 16;
 // let phaserJSON = null;
 Client.requestDataFromJSON('save');
 
+const originalJSON = Client.dataJSON;
+
 let GameState = {
     player: null,
     playerVelocity: {x:150, y:320},
@@ -88,7 +90,6 @@ let GameState = {
         self.spikes = game.add.group();
         self.spikes.enableBody = true;
         self.spikes.inputEnableChildren = true;
-        self.spikes.add(Spike(self.spikes, 'spike', 250, 250));
 
         // Ground
         // self.ground = self.platforms.create(0, game.world.height - 64, 'ground');
@@ -110,6 +111,7 @@ let GameState = {
         setTimeout(function () {
             // Read into json object
             self.phaserJSON = Client.dataJSON;
+            console.log('phaserJSON', self.phaserJSON);
 
             // Ledges and spikes - drawn after reading JSON file and according to correct version
             self.totalVersions = self.phaserJSON.versions.length;
@@ -183,6 +185,29 @@ let GameState = {
     },
 
     shutdown: function() {
+        self.player = null;
+        self.playerVelocity = null;
+        self.gravity = 0;
+        self.background = null;
+        self.firstAidBox = null;
+        self.platforms = null;
+        self.previewGroup = null;
+        self.spikes = null;
+        self.ground = null;
+        self.cursors = null;
+        self.playButton = null;
+        self.ledgeButton = null;
+        self.spikeButton = null;
+        self.toolbar = null;
+        self.buttonHighlight = null;
+        self.selectedSpriteToDraw = 'ground';
+        self.isPlaying = false;
+        self.sKey = null;
+        self.phaserJSON = null;
+        self.totalVersions = null;
+        self.currentVersion = null;
+        self.debugMode = true;
+        self.FILENAME = 'save';
         game.world.removeAll();
     },
 
@@ -527,6 +552,9 @@ let GameState = {
     restartLevel: function () {
         let self = this;
 
+        Client.requestDataFromJSON('new');
+
+        // Client.dataJSON = originalJSON;
         game.state.restart();
         undoManager.clear();
     }

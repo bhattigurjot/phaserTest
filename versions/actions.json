@@ -1,29 +1,52 @@
 {
 	"actions": [
 		{
-			"action": "move",
-			"timestamp": "2017-06-05T18:34:35.622Z",
-			"type": "ground",
-			"groupIndex": 0,
-			"x": 272,
-			"y": 80
-		},
-		{
 			"action": "add",
-			"timestamp": "2017-06-05T18:34:36.609Z",
+			"timestamp": "2017-06-08T22:54:31.484Z",
 			"type": "ground",
-			"x": 479,
-			"y": 142
+			"x": 306,
+			"y": 88
 		},
 		{
 			"action": "delete",
-			"timestamp": "2017-06-05T18:34:37.945Z",
+			"timestamp": "2017-06-08T22:54:35.860Z",
 			"type": "spike",
 			"groupIndex": 2
 		},
 		{
+			"action": "move",
+			"timestamp": "2017-06-08T22:54:37.837Z",
+			"type": "spike",
+			"groupIndex": 2,
+			"x": 384,
+			"y": 240
+		},
+		{
 			"action": "undo",
-			"timestamp": "2017-06-05T18:34:40.779Z"
+			"timestamp": "2017-06-08T22:54:39.768Z"
+		},
+		{
+			"action": "redo",
+			"timestamp": "2017-06-08T22:54:41.408Z"
+		},
+		{
+			"action": "play",
+			"timestamp": "2017-06-08T22:54:45.253Z"
+		},
+		{
+			"action": "saveFile",
+			"timestamp": "2017-06-08T22:54:51.273Z"
+		},
+		{
+			"action": "move",
+			"timestamp": "2017-06-08T22:54:55.237Z",
+			"type": "firstAidBox",
+			"x": 560,
+			"y": 496
+		},
+		{
+			"action": "saveVersion",
+			"timestamp": "2017-06-08T22:54:56.855Z"
 		}
 	]
 }

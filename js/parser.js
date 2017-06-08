@@ -33,11 +33,12 @@ function RecordActionsParser() {
             GameState.firstAidBox.x = item.x;
             GameState.firstAidBox.y = item.y;
         } else if (item.type === 'ground') {
-            GameState.platforms.getChildAt(item.groupIndex).x = item.x;
-            GameState.platforms.getChildAt(item.groupIndex).y = item.y;
+            GameState.platforms.getChildAt(item.groupIndex - 1).x = item.x;
+            GameState.platforms.getChildAt(item.groupIndex - 1).y = item.y;
         } else if (item.type === 'spike') {
-            GameState.spikes.getChildAt(item.groupIndex).x = item.x;
-            GameState.spikes.getChildAt(item.groupIndex).y = item.y;
+            console.log(GameState.spikes);
+            GameState.spikes.getChildAt(item.groupIndex - 1).x = item.x;
+            GameState.spikes.getChildAt(item.groupIndex - 1).y = item.y;
         }
     };
 
@@ -90,22 +91,53 @@ function RecordActionsParser() {
             case 'Every-Change':
                 this.recordJSON.actions.forEach(function (item) {
                     if (item.action === 'add') {
+                        console.log("add start");
                         self.addFxn(item);
+                        console.log("add mid");
                         self.saveVersionFxn();
+                        console.log("add pass");
                     }
                     if (item.action === 'delete') {
+                        console.log("del start");
                         self.deleteFxn(item);
+                        console.log("del mid");
                         self.saveVersionFxn();
+                        console.log("del pass");
                     }
                     if (item.action === 'move') {
+                        console.log("move start");
                         self.moveFxn(item);
+                        console.log("move mid");
                         self.saveVersionFxn();
+                        console.log("move pass");
                     }
                     if (item.action === "undo") {
                         self.undoFxn();
                     }
                     if (item.action === "redo") {
                         self.redoFxn();
+                    }
+                });
+                break;
+            case 'Explicit':
+                this.recordJSON.actions.forEach(function (item) {
+                    if (item.action === 'add') {
+                        self.addFxn(item);
+                    }
+                    if (item.action === 'delete') {
+                        self.deleteFxn(item);
+                    }
+                    if (item.action === 'move') {
+                        self.moveFxn(item);
+                    }
+                    if (item.action === "undo") {
+                        self.undoFxn();
+                    }
+                    if (item.action === "redo") {
+                        self.redoFxn();
+                    }
+                    if (item.action === "saveVersion") {
+                        self.saveVersionFxn();
                     }
                 });
                 break;
@@ -128,22 +160,44 @@ function handleFileSelect(evt) {
     reader.onload = (function(theFile) {
         return function(e) {
             // Render thumbnail.
+            console.log('game', GameState.spikes);
+            localStorage.clear();
+            GameState.restartLevel();
+
+            console.log(1);
             recordParser.recordJSON = JSON.parse(e.target.result);
-            recordParser.read('Play');
+
+            console.log(recordParser.recordJSON);
+
             GameState.FILENAME = 'play';
+            recordParser.read('Play');
             Client.requestDataFromJSON('play');
             localStorage.setItem('v-play', JSON.stringify(Client.dataJSON));
             GameState.restartLevel();
 
-            console.log(Client.dataJSON);
+            console.log(1);
 
-            recordParser.read('Every-Change');
+            console.log(2);
+
             GameState.FILENAME = 'everyChange';
+            recordParser.read('Every-Change');
             Client.requestDataFromJSON('everyChange');
             localStorage.setItem('v-every-change', JSON.stringify(Client.dataJSON));
             GameState.restartLevel();
 
+            console.log(2);
+
+            console.log(3);
+
+            GameState.FILENAME = 'explicit';
+            recordParser.read('Explicit');
+            Client.requestDataFromJSON('explicit');
+            localStorage.setItem('v-explicit', JSON.stringify(Client.dataJSON));
+            GameState.restartLevel();
+
             console.log(Client.dataJSON);
+
+            console.log(3);
         };
     })(f);
 

@@ -133,3 +133,5 @@ let t1 = new Tree(JSON.parse(localStorage.getItem('v-play')), 'treeDiv-1');
 t1.drawTree();
 let t2 = new Tree(JSON.parse(localStorage.getItem('v-every-change')), 'treeDiv-2');
 t2.drawTree();
+let t3 = new Tree(JSON.parse(localStorage.getItem('v-explicit')), 'treeDiv-3');
+t3.drawTree();

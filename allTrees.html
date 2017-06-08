@@ -23,7 +23,7 @@
         .treeContainer {
             z-index: 10;
             width: 500px;
-            height: 500px;
+            height: 480px;
             float: left;
             background-color: #d7d7d7;
             border: 1px solid lightgray;
@@ -44,27 +44,49 @@
             border: 1px solid red;
         }
 
+        .version-name {
+            height: 20px;
+            text-align: center;
+            background-color: white;
+            font-weight: bold;
+        }
+        .version-name > span {
+            color: #d61e74;
+        }
+
     </style>
 
 </head>
 <body>
     <div class="container">
         <div class="column">
+            <div class="version-name">
+                <span>Play</span>
+            </div>
             <div class="treeContainer">
                 <div class="treeDiv" id="treeDiv-1"></div>
             </div>
         </div>
         <div class="column">
+            <div class="version-name">
+                <span>Time</span>
+            </div>
             <div class="treeContainer">
                 <div class="treeDiv" id="treeDiv-2"></div>
             </div>
         </div>
         <div class="column">
+            <div class="version-name">
+                <span>Explicit</span>
+            </div>
             <div class="treeContainer">
                 <div class="treeDiv" id="treeDiv-3"></div>
             </div>
         </div>
         <div class="column">
+            <div class="version-name">
+                <span>On every 3 changes</span>
+            </div>
             <div class="treeContainer">
                 <div class="treeDiv" id="treeDiv-4"></div>
             </div>

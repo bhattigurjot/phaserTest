@@ -149,6 +149,6 @@ function handleFileSelect(evt) {
 
     // Read in the image file as a data URL.
     reader.readAsText(f);
-    window.location = '/allTrees.html';
+    window.location = '/all';
 
 };

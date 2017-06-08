@@ -35,17 +35,28 @@ function writeJSONFile(data, filename) {
     });
 }
 
-app.use(express.static(__dirname + '/'));
+// app.use(express.static(__dirname + '/'));
 
-router.get('/', (request, response) => {
-    response.send(__dirname+'/index.html');
+router.use(function (req,res,next) {
+    console.log("/" + req.method);
+    next();
 });
 
-// router.get('/all', (request, response) => {
-//     response.sendFile(__dirname+'/allTrees.html');
-// });
+router.get('/', (request, response) => {
+    response.sendFile(__dirname+'/index.html');
+});
+
+router.get('/all', (request, response) => {
+    response.sendFile(__dirname+'/allTrees.html');
+});
 
 module.exports = router;
+
+app.use(express.static(__dirname + '/'), router);
+
+app.use("*", (request, response) =>{
+    response.send("404 not found");
+});
 
 server.listen(port, function () {
     console.log('Listening on ' + server.address().port);

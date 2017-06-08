@@ -17,13 +17,13 @@
             margin: 0 auto;
         }
 
-        #treeDiv{
+        .treeDiv{
             height: 100%;
         }
-        #treeContainer {
+        .treeContainer {
             z-index: 10;
-            width: 400px;
-            height: 600px;
+            width: 500px;
+            height: 500px;
             float: left;
             background-color: #d7d7d7;
             border: 1px solid lightgray;
@@ -49,23 +49,28 @@
 </head>
 <body>
     <div class="container">
-        <div class="column"></div>
-        <div class="column"></div>
-        <div class="column"></div>
-        <div class="column"></div>
-        <!--<div id="treeContainer">-->
-            <!--<div id="treeDiv"></div>-->
-        <!--</div>-->
-
+        <div class="column">
+            <div class="treeContainer">
+                <div class="treeDiv" id="treeDiv-1"></div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="treeContainer">
+                <div class="treeDiv" id="treeDiv-2"></div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="treeContainer">
+                <div class="treeDiv" id="treeDiv-3"></div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="treeContainer">
+                <div class="treeDiv" id="treeDiv-4"></div>
+            </div>
+        </div>
     </div>
 
-    <script src="js/client.js"></script>
-    <script src="js/record.js"></script>
-    <script src="js/vendor/undomanager.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/boot.js"></script>
-    <script src="js/treeVis.js"></script>
-    <script src="js/parser.js"></script>
-
+    <script src="js/treeVisAll.js"></script>
 </body>
 </html>

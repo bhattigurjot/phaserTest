@@ -108,13 +108,16 @@ function handleFileSelect(evt) {
             // Render thumbnail.
             recordParser.recordJSON = JSON.parse(e.target.result);
             console.log(recordParser.recordJSON);
-            recordParser.read('Play');
+            // recordParser.read('Play');
 
-            window.open(
-                "/allTrees.html",
-                "DescriptiveWindowName",
-                "resizable,scrollbars,status"
-            );
+            localStorage.setItem('val', JSON.stringify(recordParser.recordJSON));
+            window.location = '/allTrees.html';
+
+            // window.open(
+            //     "/allTrees.html",
+            //     "DescriptiveWindowName",
+            //     "resizable,scrollbars,status"
+            // );
         };
     })(f);
 

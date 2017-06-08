@@ -6,6 +6,7 @@
 
 const express = require('express');
 const app = express();
+const router = express.Router();
 const server = require('http').Server(app);
 const port = 3000;
 const io = require('socket.io').listen(server);
@@ -36,9 +37,15 @@ function writeJSONFile(data, filename) {
 
 app.use(express.static(__dirname + '/'));
 
-app.get('/', (request, response) => {
+router.get('/', (request, response) => {
     response.send(__dirname+'/index.html');
 });
+
+// router.get('/all', (request, response) => {
+//     response.sendFile(__dirname+'/allTrees.html');
+// });
+
+module.exports = router;
 
 server.listen(port, function () {
     console.log('Listening on ' + server.address().port);

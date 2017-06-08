@@ -144,21 +144,11 @@ function handleFileSelect(evt) {
             GameState.restartLevel();
 
             console.log(Client.dataJSON);
-
-            alert("yo");
-
-            window.location = '/allTrees.html';
-
-            // window.open(
-            //     "/allTrees.html",
-            //     "DescriptiveWindowName",
-            //     "resizable,scrollbars,status"
-            // );
         };
     })(f);
 
     // Read in the image file as a data URL.
     reader.readAsText(f);
-
+    window.location = '/allTrees.html';
 
 };

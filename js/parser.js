@@ -36,7 +36,6 @@ function RecordActionsParser() {
             GameState.platforms.getChildAt(item.groupIndex - 1).x = item.x;
             GameState.platforms.getChildAt(item.groupIndex - 1).y = item.y;
         } else if (item.type === 'spike') {
-            console.log(GameState.spikes);
             GameState.spikes.getChildAt(item.groupIndex - 1).x = item.x;
             GameState.spikes.getChildAt(item.groupIndex - 1).y = item.y;
         }
@@ -163,35 +162,45 @@ function handleFileSelect(evt) {
             console.log('game', GameState.spikes);
             localStorage.clear();
             GameState.restartLevel();
+            console.log('fn', GameState.FILENAME);
 
-            console.log(1);
             recordParser.recordJSON = JSON.parse(e.target.result);
 
             console.log(recordParser.recordJSON);
-
-            GameState.FILENAME = 'play';
-            recordParser.read('Play');
-            Client.requestDataFromJSON('play');
-            localStorage.setItem('v-play', JSON.stringify(Client.dataJSON));
-            GameState.restartLevel();
-
-            console.log(1);
 
             console.log(2);
 
             GameState.FILENAME = 'everyChange';
             recordParser.read('Every-Change');
-            Client.requestDataFromJSON('everyChange');
+            Client.requestDataFromJSON(GameState.FILENAME);
+            console.log('everyChange', Client.dataJSON);
+            console.log('fn', GameState.FILENAME);
             localStorage.setItem('v-every-change', JSON.stringify(Client.dataJSON));
             GameState.restartLevel();
 
             console.log(2);
 
+
+            console.log(1);
+
+            GameState.FILENAME = 'play';
+            recordParser.read('Play');
+            Client.requestDataFromJSON(GameState.FILENAME);
+            console.log('play', Client.dataJSON);
+            console.log('fn', GameState.FILENAME);
+            localStorage.setItem('v-play', JSON.stringify(Client.dataJSON));
+            GameState.restartLevel();
+
+            console.log(1);
+
+
+
             console.log(3);
 
             GameState.FILENAME = 'explicit';
             recordParser.read('Explicit');
-            Client.requestDataFromJSON('explicit');
+            Client.requestDataFromJSON(GameState.FILENAME);
+            console.log('explicit', Client.dataJSON);
             localStorage.setItem('v-explicit', JSON.stringify(Client.dataJSON));
             GameState.restartLevel();
 

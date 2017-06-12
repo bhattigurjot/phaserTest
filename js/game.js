@@ -8,6 +8,9 @@ let recordActionManager = new RecordActionsManager();
 let undoManager = new UndoManager();
 const SNAP_GRID_SIZE = 16;
 
+let firstTime = true;
+let baseJSON = null;
+
 // let obj = localStorage.getItem('all-items');
 // let phaserJSON = null;
 Client.requestDataFromJSON('save');
@@ -111,6 +114,15 @@ let GameState = {
         setTimeout(function () {
             // Read into json object
             self.phaserJSON = Client.dataJSON;
+            if (firstTime) {
+                // alert('go');
+                baseJSON = Client.dataJSON;
+                firstTime = false;
+            } else {
+                // alert('go2');
+                self.phaserJSON = baseJSON;
+            }
+
             console.log('phaserJSON', self.phaserJSON);
 
             // Ledges and spikes - drawn after reading JSON file and according to correct version
@@ -552,11 +564,18 @@ let GameState = {
     restartLevel: function () {
         let self = this;
 
-        Client.requestDataFromJSON('new');
+        // Client.requestDataFromJSON('new');
 
         // Client.dataJSON = originalJSON;
-        game.state.restart();
+        console.log('before',baseJSON);
+        console.log('before',self.phaserJSON);
+        // game.world.removeAll();
+        // game.state.restart();
         undoManager.clear();
+        game.state.start(game.state.current, true, false);
+
+        console.log('after',baseJSON);
+        console.log('after',self.phaserJSON);
     }
 
 };

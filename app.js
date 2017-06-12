@@ -27,6 +27,7 @@ function readJSONFile(file) {
     //     return temp;
     // });
     let temp = JSON.parse(fs.readFileSync('versions/'+file+'.json', 'utf8'));
+    console.log(file,temp);
     return temp;
 }
 function writeJSONFile(data, filename) {
@@ -64,6 +65,7 @@ server.listen(port, function () {
 
 io.on('connection', function (socket) {
     socket.on('getJsonData', function (fileName) {
+        console.log('get', fileName);
         dataJSON = readJSONFile(fileName);
         io.emit('jsonData', dataJSON);
     });

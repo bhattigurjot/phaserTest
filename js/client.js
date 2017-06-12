@@ -8,7 +8,7 @@ Client.socket = io.connect();
 Client.dataJSON = null;
 
 Client.requestDataFromJSON = function (fileName) {
-    console.log("request for json data");
+    console.log("request for json data", fileName);
     Client.socket.emit('getJsonData', fileName);
 };
 
@@ -18,7 +18,7 @@ Client.socket.on('jsonData', function (data) {
 });
 
 Client.saveToJSON = function (d, f) {
-    console.log("request to save json data");
+    console.log("request to save json data", f);
     let obj = {data : d, filename: f};
     Client.socket.emit('saveJsonData', obj);
 };

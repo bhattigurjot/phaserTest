@@ -108,6 +108,7 @@ function drawTree(phaserJSON) {
         if (params.nodes[0]) {
             currNodeID = params.nodes[0];
         }
+        undoManager.clear();
         GameState.readJSONAndChangeVersion(currNodeID);
     });
 

@@ -34,15 +34,14 @@ function KeyPress(e) {
         recordActionManager.saveFile();
         console.log("save actions file");
     }
-    if (obj.keyCode === 83 && obj.ctrlKey) {
-        obj.preventDefault();
-        GameState.writeJSON('saveFile');
-        console.log("save file");
-    }
     if (obj.keyCode === 83 && obj.ctrlKey && obj.shiftKey) {
         obj.preventDefault();
         GameState.writeJSON('saveVersion');
         console.log("save version");
+    } else if (obj.keyCode === 83 && obj.ctrlKey) {
+        obj.preventDefault();
+        GameState.writeJSON('saveFile');
+        console.log("save file");
     }
 }
 

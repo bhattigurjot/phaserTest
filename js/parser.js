@@ -161,8 +161,8 @@ function handleFileSelect(evt) {
             // Render thumbnail.
             console.log('game', GameState.spikes);
             localStorage.clear();
-            GameState.restartLevel();
-            console.log('fn', GameState.FILENAME);
+            // GameState.restartLevel();
+            // console.log('fn', GameState.FILENAME);
 
             recordParser.recordJSON = JSON.parse(e.target.result);
 
@@ -172,10 +172,11 @@ function handleFileSelect(evt) {
 
             GameState.FILENAME = 'everyChange';
             recordParser.read('Every-Change');
-            Client.requestDataFromJSON(GameState.FILENAME);
-            console.log('everyChange', Client.dataJSON);
-            console.log('fn', GameState.FILENAME);
-            localStorage.setItem('v-every-change', JSON.stringify(Client.dataJSON));
+            // Client.requestDataFromJSON(GameState.FILENAME);
+            // console.log('everyChange', Client.dataJSON);
+            // console.log('fn', GameState.FILENAME);
+            localStorage.setItem('v-every-change', JSON.stringify(GameState.phaserJSON));
+            console.log('v-every-change', JSON.parse(localStorage.getItem('v-every-change')));
             GameState.restartLevel();
 
             console.log(2);
@@ -185,10 +186,11 @@ function handleFileSelect(evt) {
 
             GameState.FILENAME = 'play';
             recordParser.read('Play');
-            Client.requestDataFromJSON(GameState.FILENAME);
-            console.log('play', Client.dataJSON);
-            console.log('fn', GameState.FILENAME);
-            localStorage.setItem('v-play', JSON.stringify(Client.dataJSON));
+            // Client.requestDataFromJSON(GameState.FILENAME);
+            // console.log('play', Client.dataJSON);
+            // console.log('fn', GameState.FILENAME);
+            localStorage.setItem('v-play', JSON.stringify(GameState.phaserJSON));
+            console.log('v-play', JSON.parse(localStorage.getItem('v-play')));
             GameState.restartLevel();
 
             console.log(1);
@@ -199,12 +201,13 @@ function handleFileSelect(evt) {
 
             GameState.FILENAME = 'explicit';
             recordParser.read('Explicit');
-            Client.requestDataFromJSON(GameState.FILENAME);
-            console.log('explicit', Client.dataJSON);
-            localStorage.setItem('v-explicit', JSON.stringify(Client.dataJSON));
+            // Client.requestDataFromJSON(GameState.FILENAME);
+            // console.log('explicit', Client.dataJSON);
+            localStorage.setItem('v-explicit', JSON.stringify(GameState.phaserJSON));
+            console.log('v-explicit', JSON.parse(localStorage.getItem('v-explicit')));
             GameState.restartLevel();
 
-            console.log(Client.dataJSON);
+            // console.log(Client.dataJSON);
 
             console.log(3);
         };
@@ -212,6 +215,9 @@ function handleFileSelect(evt) {
 
     // Read in the image file as a data URL.
     reader.readAsText(f);
-    window.location = '/all';
+
+    setTimeout(function () {
+        window.location = '/all';
+    }, 2000);
 
 };

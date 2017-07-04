@@ -7,7 +7,7 @@
 let recordActionManager = new RecordActionsManager();
 let undoManager = new UndoManager();
 const SNAP_GRID_SIZE = 16;
-
+// console.log("pehli");
 let firstTime = true;
 let baseJSON = null;
 
@@ -15,7 +15,7 @@ let baseJSON = null;
 // let phaserJSON = null;
 Client.requestDataFromJSON('save');
 
-const originalJSON = Client.dataJSON;
+// const originalJSON = Client.dataJSON;
 
 let GameState = {
     player: null,
@@ -105,33 +105,7 @@ let GameState = {
         // For preview
         self.previewGroup = game.add.group();
 
-        // Player
-        self.player = new Player(10,10);
-        // Health box
-        self.firstAidBox = new FirstAidBox(500,500);
-
-
-        setTimeout(function () {
-            // Read into json object
-            self.phaserJSON = Client.dataJSON;
-            if (firstTime) {
-                // alert('go');
-                baseJSON = Client.dataJSON;
-                firstTime = false;
-            } else {
-                // alert('go2');
-                self.phaserJSON = baseJSON;
-            }
-
-            console.log('phaserJSON', self.phaserJSON);
-
-            // Ledges and spikes - drawn after reading JSON file and according to correct version
-            self.totalVersions = self.phaserJSON.versions.length;
-            self.readJSONAndChangeVersion(self.totalVersions);
-
-            // Draw Tree View
-            drawTree(self.phaserJSON);
-        }, 500);
+        self.drawItems();
 
     },
 
@@ -197,30 +171,63 @@ let GameState = {
     },
 
     shutdown: function() {
-        self.player = null;
-        self.playerVelocity = null;
-        self.gravity = 0;
-        self.background = null;
-        self.firstAidBox = null;
-        self.platforms = null;
-        self.previewGroup = null;
-        self.spikes = null;
-        self.ground = null;
-        self.cursors = null;
-        self.playButton = null;
-        self.ledgeButton = null;
-        self.spikeButton = null;
-        self.toolbar = null;
-        self.buttonHighlight = null;
-        self.selectedSpriteToDraw = 'ground';
-        self.isPlaying = false;
-        self.sKey = null;
+        // self.player = null;
+        // self.playerVelocity = null;
+        // self.gravity = 0;
+        // self.background = null;
+        // self.firstAidBox = null;
+        // self.platforms = null;
+        // self.previewGroup = null;
+        // self.spikes = null;
+        // self.ground = null;
+        // self.cursors = null;
+        // self.playButton = null;
+        // self.ledgeButton = null;
+        // self.spikeButton = null;
+        // self.toolbar = null;
+        // self.buttonHighlight = null;
+        // self.selectedSpriteToDraw = 'ground';
+        // self.isPlaying = false;
+        // self.sKey = null;
         self.phaserJSON = null;
-        self.totalVersions = null;
-        self.currentVersion = null;
-        self.debugMode = true;
-        self.FILENAME = 'save';
-        game.world.removeAll();
+        // self.totalVersions = null;
+        // self.currentVersion = null;
+        // self.debugMode = true;
+        // self.FILENAME = 'save';
+        // game.world.removeAll();
+    },
+
+    drawItems: function () {
+        let self = this;
+
+        // Player
+        self.player = new Player(10,10);
+        // Health box
+        self.firstAidBox = new FirstAidBox(500,500);
+
+        console.log('create');
+        // setTimeout(function () {
+            // Read into json object
+            // self.phaserJSON = originalJSON;
+            if (firstTime) {
+                console.log('go');
+                baseJSON = Client.dataJSON;
+                self.phaserJSON = Client.dataJSON;
+                firstTime = false;
+            } else {
+                console.log('go2');
+                self.phaserJSON = baseJSON;
+            }
+
+            console.log('phaserJSON', self.phaserJSON);
+
+            // Ledges and spikes - drawn after reading JSON file and according to correct version
+            self.totalVersions = self.phaserJSON.versions.length;
+            self.readJSONAndChangeVersion(self.totalVersions);
+
+            // Draw Tree View
+            drawTree(self.phaserJSON);
+        // }, 0);
     },
 
     drawToolbar: function () {
@@ -567,15 +574,17 @@ let GameState = {
         // Client.requestDataFromJSON('new');
 
         // Client.dataJSON = originalJSON;
-        console.log('before',baseJSON);
-        console.log('before',self.phaserJSON);
-        // game.world.removeAll();
+        // console.log('before',baseJSON);
+        // console.log('before',self.phaserJSON);
+        self.phaserJSON = baseJSON;
+        game.world.removeAll();
         // game.state.restart();
         undoManager.clear();
-        game.state.start(game.state.current, true, false);
+        game.state.start('gameStart', true, false);
+        self.drawItems();
 
-        console.log('after',baseJSON);
-        console.log('after',self.phaserJSON);
+        // console.log('after',baseJSON);
+        // console.log('after',self.phaserJSON);
     }
 
 };

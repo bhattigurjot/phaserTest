@@ -27,10 +27,11 @@ function readJSONFile(file) {
     //     return temp;
     // });
     let temp = JSON.parse(fs.readFileSync('versions/'+file+'.json', 'utf8'));
-    console.log(file,temp);
+    // console.log(file,temp);
     return temp;
 }
 function writeJSONFile(data, filename) {
+    // console.log('filename',filename);
     fs.writeFile('versions/'+filename+'.json', JSON.stringify(data, null, '\t'), 'utf8', function (err) {
         if (err) throw err;
     });
@@ -69,7 +70,8 @@ io.on('connection', function (socket) {
         dataJSON = readJSONFile(fileName);
         io.emit('jsonData', dataJSON);
     });
-    socket.on('saveJsonData', function (data) {
-        writeJSONFile(data.data, data.filename);
+    socket.on('saveJsonData', function (d) {
+        console.log('put', d);
+        writeJSONFile(d.data, d.filename);
     });
 });

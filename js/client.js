@@ -10,15 +10,16 @@ Client.dataJSON = null;
 Client.requestDataFromJSON = function (fileName) {
     console.log("request for json data", fileName);
     Client.socket.emit('getJsonData', fileName);
+    Client.socket.on('jsonData', function (data) {
+        console.log("json data recieved");
+        Client.dataJSON = data;
+    });
 };
 
-Client.socket.on('jsonData', function (data) {
-    console.log("json data recieved");
-    Client.dataJSON = data;
-});
+
 
 Client.saveToJSON = function (d, f) {
     console.log("request to save json data", f);
-    let obj = {data : d, filename: f};
-    Client.socket.emit('saveJsonData', obj);
+    // let obj = {data : d, filename: f};
+    Client.socket.emit('saveJsonData', {data : d, filename: f});
 };

@@ -1,2 +1,5 @@
 .idea/
 node_modules/
+versions/saved/*
+versions/actions.json
+versions/save.json

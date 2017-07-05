@@ -108,6 +108,14 @@ function drawTree(phaserJSON) {
         if (params.nodes[0]) {
             currNodeID = params.nodes[0];
         }
+
+        recordActionManager.add({
+            "action": "change-version",
+            "timestamp": (new Date).toISOString(),
+            "ver": currNodeID,
+            "items": JSON.stringify(GameState.phaserJSON.versions[currNodeID-1].items)
+        });
+
         undoManager.clear();
         GameState.readJSONAndChangeVersion(currNodeID);
     });

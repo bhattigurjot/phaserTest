@@ -57,6 +57,20 @@ function RecordActionsParser() {
         GameState.writeJSON('saveVersion');
     };
 
+    this.changeVersionFxn = function (data) {
+
+        let str = JSON.stringify(data.items);
+        str = str.replace(/\\/g, '').slice(1, -1);
+
+        GameState.phaserJSON.versions.forEach(function (item, index){
+            if (JSON.stringify(item.items) === str) {
+                undoManager.clear();
+                GameState.readJSONAndChangeVersion(index+1);
+            }
+        });
+
+    };
+
     this.read = function (STATE) {
 
         switch (STATE) {
@@ -80,6 +94,9 @@ function RecordActionsParser() {
                     }
                     if (item.action === "redo") {
                         self.redoFxn();
+                    }
+                    if (item.action === "change-version") {
+                        self.changeVersionFxn(item);
                     }
 
                     if (index === 0) {
@@ -114,6 +131,9 @@ function RecordActionsParser() {
                     if (item.action === "redo") {
                         self.redoFxn();
                     }
+                    if (item.action === "change-version") {
+                        self.changeVersionFxn(item);
+                    }
                 });
                 break;
             case 'Every-Change':
@@ -137,6 +157,9 @@ function RecordActionsParser() {
                     if (item.action === "redo") {
                         self.redoFxn();
                     }
+                    if (item.action === "change-version") {
+                        self.changeVersionFxn(item);
+                    }
                 });
                 break;
             case 'Explicit':
@@ -157,8 +180,14 @@ function RecordActionsParser() {
                     if (item.action === "redo") {
                         self.redoFxn();
                     }
+                    // if (item.action === "saveFile") {
+                    //     self.saveFileFxn();
+                    // }
                     if (item.action === "saveVersion") {
                         self.saveVersionFxn();
+                    }
+                    if (item.action === "change-version") {
+                        self.changeVersionFxn(item);
                     }
                 });
                 break;
@@ -185,6 +214,9 @@ function RecordActionsParser() {
                     if (item.action === "redo") {
                         self.redoFxn();
                         count += 1;
+                    }
+                    if (item.action === "change-version") {
+                        self.changeVersionFxn(item);
                     }
                     if (count === 3) {
                         count = 0;

@@ -7,15 +7,14 @@
 let recordActionManager = new RecordActionsManager();
 let undoManager = new UndoManager();
 const SNAP_GRID_SIZE = 16;
-// console.log("pehli");
 let firstTime = true;
-let baseJSON = null;
 
-// let obj = localStorage.getItem('all-items');
-// let phaserJSON = null;
 Client.requestDataFromJSON('save');
-
-// const originalJSON = Client.dataJSON;
+let originalJSON = null;
+setTimeout(function () {
+    originalJSON = Client.dataJSON;
+    localStorage.setItem('original', JSON.stringify(originalJSON));
+}, 1500);
 
 let GameState = {
     player: null,
@@ -190,8 +189,8 @@ let GameState = {
         // self.isPlaying = false;
         // self.sKey = null;
         self.phaserJSON = null;
-        // self.totalVersions = null;
-        // self.currentVersion = null;
+        self.totalVersions = null;
+        self.currentVersion = null;
         // self.debugMode = true;
         // self.FILENAME = 'save';
         // game.world.removeAll();
@@ -205,29 +204,19 @@ let GameState = {
         // Health box
         self.firstAidBox = new FirstAidBox(500,500);
 
-        console.log('create');
-        // setTimeout(function () {
-            // Read into json object
-            // self.phaserJSON = originalJSON;
-            if (firstTime) {
-                console.log('go');
-                baseJSON = Client.dataJSON;
-                self.phaserJSON = Client.dataJSON;
-                firstTime = false;
-            } else {
-                console.log('go2');
-                self.phaserJSON = baseJSON;
-            }
+        if (firstTime) {
+            self.phaserJSON = Client.dataJSON;
+            firstTime = false;
+        } else {
+            self.phaserJSON = JSON.parse(localStorage.getItem('original'))
+        }
 
-            console.log('phaserJSON', self.phaserJSON);
+        // Ledges and spikes - drawn after reading JSON file and according to correct version
+        self.totalVersions = self.phaserJSON.versions.length;
+        self.readJSONAndChangeVersion(self.totalVersions);
 
-            // Ledges and spikes - drawn after reading JSON file and according to correct version
-            self.totalVersions = self.phaserJSON.versions.length;
-            self.readJSONAndChangeVersion(self.totalVersions);
-
-            // Draw Tree View
-            drawTree(self.phaserJSON);
-        // }, 0);
+        // Draw Tree View
+        drawTree(self.phaserJSON);
     },
 
     drawToolbar: function () {
@@ -403,6 +392,7 @@ let GameState = {
             if (item.id === self.currentVersion && !self.isPlaying && saveAction === 'saveFile') {
 
                 // CHeck if both versions are equal or not
+                console.log('number', self.phaserJSON.versions.length);
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
                     JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
                     JSON.stringify(firstAidBoxPos) !== JSON.stringify(item.items.box) ||
@@ -425,6 +415,7 @@ let GameState = {
             if (item.id === self.currentVersion && !self.isPlaying && saveAction === 'saveVersion') {
 
                 // Check if both versions are equal or not
+                console.log('number', self.phaserJSON.versions.length);
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
                     JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
                     JSON.stringify(firstAidBoxPos) !== JSON.stringify(item.items.box) ||
@@ -571,24 +562,14 @@ let GameState = {
     restartLevel: function () {
         let self = this;
 
-        // Client.requestDataFromJSON('new');
-
-        // Client.dataJSON = originalJSON;
-        // console.log('before',baseJSON);
-        // console.log('before',self.phaserJSON);
-        self.phaserJSON = baseJSON;
         game.world.removeAll();
-        // game.state.restart();
         undoManager.clear();
-        game.state.start('gameStart', true, false);
+        game.state.start('gameStart');
+        self.phaserJSON = originalJSON;
         self.drawItems();
 
-        // console.log('after',baseJSON);
-        // console.log('after',self.phaserJSON);
     }
-
 };
-
 
 // This resets the player position and makes ledges movable
 function reset(playButton, player, ledges, spikes) {

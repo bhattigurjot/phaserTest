@@ -12,10 +12,7 @@ const port = 3000;
 const io = require('socket.io').listen(server);
 const fs = require('fs');
 
-// let dataJSON;
-
 let dataJSON = readJSONFile('save');
-// writeJSONFile();
 
 function readJSONFile(file) {
     // Read the file and send to the callback

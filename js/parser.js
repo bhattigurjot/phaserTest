@@ -160,56 +160,26 @@ function handleFileSelect(evt) {
         return function(e) {
             // Render thumbnail.
             console.log('game', GameState.spikes);
-            localStorage.clear();
-            // GameState.restartLevel();
-            // console.log('fn', GameState.FILENAME);
+            // localStorage.clear();
+            GameState.restartLevel();
 
             recordParser.recordJSON = JSON.parse(e.target.result);
 
-            console.log(recordParser.recordJSON);
-
-            console.log(2);
-
             GameState.FILENAME = 'everyChange';
             recordParser.read('Every-Change');
-            // Client.requestDataFromJSON(GameState.FILENAME);
-            // console.log('everyChange', Client.dataJSON);
-            // console.log('fn', GameState.FILENAME);
             localStorage.setItem('v-every-change', JSON.stringify(GameState.phaserJSON));
-            console.log('v-every-change', JSON.parse(localStorage.getItem('v-every-change')));
             GameState.restartLevel();
-
-            console.log(2);
-
-
-            console.log(1);
 
             GameState.FILENAME = 'play';
             recordParser.read('Play');
-            // Client.requestDataFromJSON(GameState.FILENAME);
-            // console.log('play', Client.dataJSON);
-            // console.log('fn', GameState.FILENAME);
             localStorage.setItem('v-play', JSON.stringify(GameState.phaserJSON));
-            console.log('v-play', JSON.parse(localStorage.getItem('v-play')));
             GameState.restartLevel();
-
-            console.log(1);
-
-
-
-            console.log(3);
 
             GameState.FILENAME = 'explicit';
             recordParser.read('Explicit');
-            // Client.requestDataFromJSON(GameState.FILENAME);
-            // console.log('explicit', Client.dataJSON);
             localStorage.setItem('v-explicit', JSON.stringify(GameState.phaserJSON));
-            console.log('v-explicit', JSON.parse(localStorage.getItem('v-explicit')));
             GameState.restartLevel();
 
-            // console.log(Client.dataJSON);
-
-            console.log(3);
         };
     })(f);
 

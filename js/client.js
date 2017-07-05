@@ -16,8 +16,6 @@ Client.requestDataFromJSON = function (fileName) {
     });
 };
 
-
-
 Client.saveToJSON = function (d, f) {
     console.log("request to save json data", f);
     // let obj = {data : d, filename: f};

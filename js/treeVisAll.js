@@ -135,3 +135,5 @@ let t2 = new Tree(JSON.parse(localStorage.getItem('v-every-change')), 'treeDiv-2
 t2.drawTree();
 let t3 = new Tree(JSON.parse(localStorage.getItem('v-explicit')), 'treeDiv-3');
 t3.drawTree();
+let t4 = new Tree(JSON.parse(localStorage.getItem('3-changes')), 'treeDiv-4');
+t4.drawTree();

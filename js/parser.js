@@ -140,6 +140,33 @@ function RecordActionsParser() {
                     }
                 });
                 break;
+            case '3-Changes':
+                let count = 0;
+                this.recordJSON.actions.forEach(function (item) {
+                    if (count == 3) {
+                        count = 0;
+                        self.saveVersionFxn();
+                    }
+                    if (item.action === 'add') {
+                        self.addFxn(item);
+                        count += 1;
+                    }
+                    if (item.action === 'delete') {
+                        self.deleteFxn(item);
+                        count += 1;
+                    }
+                    if (item.action === 'move') {
+                        self.moveFxn(item);
+                        count += 1;
+                    }
+                    if (item.action === "undo") {
+                        self.undoFxn();
+                    }
+                    if (item.action === "redo") {
+                        self.redoFxn();
+                    }
+                });
+                break;
             default:
                 console.log('Sorry, ' + STATE + ' state not found.');
         }
@@ -178,6 +205,11 @@ function handleFileSelect(evt) {
             GameState.FILENAME = 'explicit';
             recordParser.read('Explicit');
             localStorage.setItem('v-explicit', JSON.stringify(GameState.phaserJSON));
+            GameState.restartLevel();
+
+            GameState.FILENAME = '3changes';
+            recordParser.read('3-Changes');
+            localStorage.setItem('3-changes', JSON.stringify(GameState.phaserJSON));
             GameState.restartLevel();
 
         };

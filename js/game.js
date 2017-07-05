@@ -9,6 +9,9 @@ let undoManager = new UndoManager();
 const SNAP_GRID_SIZE = 16;
 let firstTime = true;
 
+// Clear Local Storage before starting
+localStorage.clear();
+
 Client.requestDataFromJSON('save');
 let originalJSON = null;
 setTimeout(function () {
@@ -397,7 +400,6 @@ let GameState = {
             if (item.id === self.currentVersion && !self.isPlaying && saveAction === 'saveFile') {
 
                 // CHeck if both versions are equal or not
-                console.log('number', self.phaserJSON.versions.length);
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
                     JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
                     JSON.stringify(firstAidBoxPos) !== JSON.stringify(item.items.box) ||
@@ -420,7 +422,6 @@ let GameState = {
             if (item.id === self.currentVersion && !self.isPlaying && saveAction === 'saveVersion') {
 
                 // Check if both versions are equal or not
-                console.log('number', self.phaserJSON.versions.length);
                 if (JSON.stringify(ledgeArray) !== JSON.stringify(item.items.ledges) ||
                     JSON.stringify(spikeArray) !== JSON.stringify(item.items.spikes) ||
                     JSON.stringify(firstAidBoxPos) !== JSON.stringify(item.items.box) ||

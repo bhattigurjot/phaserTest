@@ -61,8 +61,36 @@ function RecordActionsParser() {
 
         switch (STATE) {
             case 'Time':
-                this.recordJSON.actions.forEach(function (item) {
+                console.log("Time");
 
+                let prev = null;
+                let curr = null;
+                this.recordJSON.actions.forEach(function (item, index) {
+                    if (item.action === 'add') {
+                        self.addFxn(item);
+                    }
+                    if (item.action === 'delete') {
+                        self.deleteFxn(item);
+                    }
+                    if (item.action === 'move') {
+                        self.moveFxn(item);
+                    }
+                    if (item.action === "undo") {
+                        self.undoFxn();
+                    }
+                    if (item.action === "redo") {
+                        self.redoFxn();
+                    }
+
+                    if (index === 0) {
+                        prev = new Date(item.timestamp);
+                    }
+                    curr = new Date(item.timestamp);
+                    // for every 1 second
+                    if ((curr.getTime() - prev.getTime())/1000 >= 1) {
+                        self.saveVersionFxn();
+                    }
+                    prev = new Date(item.timestamp);
                 });
                 break;
             case 'Play':
@@ -158,7 +186,7 @@ function RecordActionsParser() {
                         self.redoFxn();
                         count += 1;
                     }
-                    if (count == 3) {
+                    if (count === 3) {
                         count = 0;
                         self.saveVersionFxn();
                     }
@@ -183,11 +211,6 @@ function handleFileSelect(evt) {
     // Closure to capture the file information.
     reader.onload = (function(theFile) {
         return function(e) {
-            // Render thumbnail.
-            console.log('game', GameState.spikes);
-            // localStorage.clear();
-            // GameState.restartLevel();
-
             recordParser.recordJSON = JSON.parse(e.target.result);
 
             GameState.FILENAME = 'everyChange';
@@ -207,7 +230,12 @@ function handleFileSelect(evt) {
 
             GameState.FILENAME = '3changes';
             recordParser.read('3-Changes');
-            localStorage.setItem('3-changes', JSON.stringify(GameState.phaserJSON));
+            localStorage.setItem('v-3-changes', JSON.stringify(GameState.phaserJSON));
+            GameState.restartLevel();
+
+            GameState.FILENAME = 'time';
+            recordParser.read('Time');
+            localStorage.setItem('v-time', JSON.stringify(GameState.phaserJSON));
             GameState.restartLevel();
 
         };

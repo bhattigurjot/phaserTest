@@ -12,7 +12,7 @@ let firstTime = true;
 // Clear Local Storage before starting
 localStorage.clear();
 
-Client.requestDataFromJSON('save');
+Client.requestDataFromJSON('template');
 let originalJSON = null;
 setTimeout(function () {
     originalJSON = Client.dataJSON;

@@ -33,8 +33,8 @@ function RecordActionsParser() {
             GameState.firstAidBox.x = item.x;
             GameState.firstAidBox.y = item.y;
         } else if (item.type === 'ground') {
-            GameState.platforms.getChildAt(item.groupIndex - 1).x = item.x;
-            GameState.platforms.getChildAt(item.groupIndex - 1).y = item.y;
+            GameState.platforms.getChildAt(item.groupIndex).x = item.x;
+            GameState.platforms.getChildAt(item.groupIndex).y = item.y;
         } else if (item.type === 'spike') {
             GameState.spikes.getChildAt(item.groupIndex).x = item.x;
             GameState.spikes.getChildAt(item.groupIndex).y = item.y;
@@ -213,27 +213,27 @@ function handleFileSelect(evt) {
         return function(e) {
             recordParser.recordJSON = JSON.parse(e.target.result);
 
-            GameState.FILENAME = 'everyChange';
+            GameState.FILENAME = 'saved/everyChange';
             recordParser.read('Every-Change');
             localStorage.setItem('v-every-change', JSON.stringify(GameState.phaserJSON));
             GameState.restartLevel();
 
-            GameState.FILENAME = 'play';
+            GameState.FILENAME = 'saved/play';
             recordParser.read('Play');
             localStorage.setItem('v-play', JSON.stringify(GameState.phaserJSON));
             GameState.restartLevel();
 
-            GameState.FILENAME = 'explicit';
+            GameState.FILENAME = 'saved/explicit';
             recordParser.read('Explicit');
             localStorage.setItem('v-explicit', JSON.stringify(GameState.phaserJSON));
             GameState.restartLevel();
 
-            GameState.FILENAME = '3changes';
+            GameState.FILENAME = 'saved/3changes';
             recordParser.read('3-Changes');
             localStorage.setItem('v-3-changes', JSON.stringify(GameState.phaserJSON));
             GameState.restartLevel();
 
-            GameState.FILENAME = 'time';
+            GameState.FILENAME = 'saved/time';
             recordParser.read('Time');
             localStorage.setItem('v-time', JSON.stringify(GameState.phaserJSON));
             GameState.restartLevel();

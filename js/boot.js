@@ -29,6 +29,10 @@ function KeyPress(e) {
         });
         console.log("redo",undoManager.getIndex());
     }
+    if (obj.keyCode === 82 && obj.ctrlKey) {
+        obj.preventDefault();
+        console.log("Refresh not alowed");
+    }
     if (obj.keyCode === 32 && obj.ctrlKey) {
         obj.preventDefault();
         recordActionManager.saveFile();

@@ -307,6 +307,11 @@ let GameState = {
             self.firstAidBox.enableBody = true;
             self.firstAidBox.body.moves = true;
         } else {
+            recordActionManager.add({
+                "action": "pause",
+                "timestamp": (new Date).toISOString()
+            });
+
             // Resets scene
             reset(self.playButton, self.player, self.platforms, self.spikes);
             // un-hide toolbar

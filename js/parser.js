@@ -36,8 +36,8 @@ function RecordActionsParser() {
             GameState.platforms.getChildAt(item.groupIndex - 1).x = item.x;
             GameState.platforms.getChildAt(item.groupIndex - 1).y = item.y;
         } else if (item.type === 'spike') {
-            GameState.spikes.getChildAt(item.groupIndex - 1).x = item.x;
-            GameState.spikes.getChildAt(item.groupIndex - 1).y = item.y;
+            GameState.spikes.getChildAt(item.groupIndex).x = item.x;
+            GameState.spikes.getChildAt(item.groupIndex).y = item.y;
         }
     };
 
@@ -66,6 +66,7 @@ function RecordActionsParser() {
                 });
                 break;
             case 'Play':
+                console.log("Play");
                 this.recordJSON.actions.forEach(function (item) {
                     if (item.action === 'add') {
                         self.addFxn(item);
@@ -88,27 +89,19 @@ function RecordActionsParser() {
                 });
                 break;
             case 'Every-Change':
+                console.log("Every-Change");
                 this.recordJSON.actions.forEach(function (item) {
                     if (item.action === 'add') {
-                        console.log("add start");
                         self.addFxn(item);
-                        console.log("add mid");
                         self.saveVersionFxn();
-                        console.log("add pass");
                     }
                     if (item.action === 'delete') {
-                        console.log("del start");
                         self.deleteFxn(item);
-                        console.log("del mid");
                         self.saveVersionFxn();
-                        console.log("del pass");
                     }
                     if (item.action === 'move') {
-                        console.log("move start");
                         self.moveFxn(item);
-                        console.log("move mid");
                         self.saveVersionFxn();
-                        console.log("move pass");
                     }
                     if (item.action === "undo") {
                         self.undoFxn();
@@ -119,6 +112,7 @@ function RecordActionsParser() {
                 });
                 break;
             case 'Explicit':
+                console.log("Explicit");
                 this.recordJSON.actions.forEach(function (item) {
                     if (item.action === 'add') {
                         self.addFxn(item);
@@ -141,12 +135,9 @@ function RecordActionsParser() {
                 });
                 break;
             case '3-Changes':
+                console.log("3 changes");
                 let count = 0;
                 this.recordJSON.actions.forEach(function (item) {
-                    if (count == 3) {
-                        count = 0;
-                        self.saveVersionFxn();
-                    }
                     if (item.action === 'add') {
                         self.addFxn(item);
                         count += 1;
@@ -161,10 +152,17 @@ function RecordActionsParser() {
                     }
                     if (item.action === "undo") {
                         self.undoFxn();
+                        count += 1;
                     }
                     if (item.action === "redo") {
                         self.redoFxn();
+                        count += 1;
                     }
+                    if (count == 3) {
+                        count = 0;
+                        self.saveVersionFxn();
+                    }
+
                 });
                 break;
             default:
@@ -188,7 +186,7 @@ function handleFileSelect(evt) {
             // Render thumbnail.
             console.log('game', GameState.spikes);
             // localStorage.clear();
-            GameState.restartLevel();
+            // GameState.restartLevel();
 
             recordParser.recordJSON = JSON.parse(e.target.result);
 

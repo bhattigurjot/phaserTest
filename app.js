@@ -10,31 +10,56 @@ const router = express.Router();
 const server = require('http').Server(app);
 const port = 3000;
 const io = require('socket.io').listen(server);
-const fs = require('fs');
+const fs = require('fs-extra');
 
-let dataJSON = readJSONFile('save');
+let dataJSON = null;
+let users = [];
 
-function readJSONFile(file) {
+function addUser(id) {
+    console.log(id);
+    try {
+        fs.copySync('versions/template.json', 'versions/'+id+'/save.json');
+        console.log('success!')
+    } catch (err) {
+        console.error(err)
+    }
+
+    dataJSON = readJSONFile('save', getID(id));
+}
+
+function getID(data) {
+    for (let i in users) {
+        if (users[i].id === data) {
+            return users[i].clientID;
+        }
+    }
+}
+
+function getClientID(data) {
+    for (let i in users) {
+        if (users[i].clientID === data) {
+            return users[i].id;
+        }
+    }
+}
+
+function readJSONFile(file, id) {
     // Read the file and send to the callback
-    // let temp = null;
-    // fs.readFile('versions/'+file+'.json', function (err, data) {
-    //     if (err) throw err;
-    //     let temp = JSON.parse(data);
-    //     // console.log(dataJSON);
-    //     return temp;
-    // });
-    let temp = JSON.parse(fs.readFileSync('versions/'+file+'.json', 'utf8'));
+
+    let cid = getClientID(id);
+
+    let temp = JSON.parse(fs.readFileSync('versions/'+cid+'/'+file+'.json', 'utf8'));
     // console.log(file,temp);
     return temp;
+
 }
-function writeJSONFile(data, filename) {
-    // console.log('filename',filename);
-    fs.writeFile('versions/'+filename+'.json', JSON.stringify(data, null, '\t'), 'utf8', function (err) {
+function writeJSONFile(data, filename, id) {
+    let cid = getClientID(id);
+
+    fs.outputFile('versions/'+cid+'/'+filename+'.json', JSON.stringify(data, null, '\t'), 'utf8', function (err) {
         if (err) throw err;
     });
 }
-
-// app.use(express.static(__dirname + '/'));
 
 router.use(function (req,res,next) {
     console.log("/" + req.method);
@@ -62,13 +87,23 @@ server.listen(port, function () {
 });
 
 io.on('connection', function (socket) {
-    socket.on('getJsonData', function (fileName) {
+
+    socket.on('addUser', function () {
+        let thisID = users.length + 1;
+        users.push({
+            id: thisID,
+            clientID: socket.id
+        });
+        addUser(thisID);
+    });
+
+    socket.on('getJsonData', function (fileName, id) {
         console.log('get', fileName);
-        dataJSON = readJSONFile(fileName);
-        io.emit('jsonData', dataJSON);
+        dataJSON = readJSONFile(fileName, id);
+        socket.emit('jsonData', dataJSON);
     });
     socket.on('saveJsonData', function (d) {
         console.log('put', d);
-        writeJSONFile(d.data, d.filename);
+        writeJSONFile(d.data, d.filename, d.id);
     });
 });

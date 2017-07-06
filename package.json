@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "express": "^4.15.3",
+    "fs-extra": "^3.0.1",
     "socket.io": "^2.0.1"
   },
   "devDependencies": {},

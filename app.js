@@ -97,6 +97,34 @@ io.on('connection', function (socket) {
         addUser(thisID);
     });
 
+    // socket.on('addUser', function (data) {
+    //
+    //     if (data === null) {
+    //         // if localstorage is not set
+    //         let thisID = users.length + 1;
+    //         users.push({
+    //             id: thisID,
+    //             clientID: socket.id
+    //         });
+    //         addUser(thisID);
+    //     } else {
+    //         // if localstorage is set
+    //         if (users.filter(function(e){return e.clientID === data;}).length > 0) {
+    //             // if client id exists in users
+    //         } else {
+    //             // if client id does not exists in users
+    //             let thisID = users.length + 1;
+    //             users.push({
+    //                 id: thisID,
+    //                 clientID: data
+    //             });
+    //             addUser(thisID);
+    //         }
+    //     }
+    //
+    //     console.log(users);
+    // });
+
     socket.on('getJsonData', function (fileName, id) {
         console.log('get', fileName);
         dataJSON = readJSONFile(fileName, id);

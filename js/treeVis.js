@@ -41,7 +41,8 @@ options = {
     },
     layout: {
         hierarchical: {
-            direction: 'UD'
+            direction: 'UD',
+            sortMethod: 'directed'
         }
     },
     interaction:{

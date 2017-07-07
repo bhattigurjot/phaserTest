@@ -42,7 +42,8 @@ let Tree = function(val, id) {
         },
         layout: {
             hierarchical: {
-                direction: 'UD'
+                direction: 'UD',
+                sortMethod: 'directed'
             }
         },
         interaction:{
